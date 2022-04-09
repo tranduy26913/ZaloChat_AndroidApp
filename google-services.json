@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "37691525458",
+    "firebase_url": "https://zalo-3bea3-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "zalo-3bea3",
+    "storage_bucket": "zalo-3bea3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37691525458:android:95c324c3a5f8d07b9dd28b",
+        "android_client_info": {
+          "package_name": "com.android.zalochat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "37691525458-lvofd0qqckdf6mg25q6mvrm2jvhebfla.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.zalochat",
+            "certificate_hash": "3b8fb11078bb58e5a993703ec13dc7fdae615d72"
+          }
+        },
+        {
+          "client_id": "37691525458-ulvdia7la6b9qmbv94ctv77a1lvtdgbe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3d9ab4LLNAxiirSi_5gmeHqdDgaYBdRQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "37691525458-ulvdia7la6b9qmbv94ctv77a1lvtdgbe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

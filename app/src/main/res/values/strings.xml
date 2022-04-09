@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ZaloChat</string>
+    <string name="phone">Số điện thoại</string>
+    <string name="password">Mật khẩu</string>
+    <string name="send_code_to_activate">Gửi mã kích hoạt</string>
+    <string name="send_code_to_activate_fail">Gửi mã kích hoạt thất bại</string>
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="forget_password">Quên mật khẩu</string>
+</resources>
