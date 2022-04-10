@@ -10,4 +10,5 @@
     <color name="login_button">#FF1C5E88</color>
     <color name="txt_color">#333333</color>
     <color name="main_color_bg">#0091ff</color>
+    <color name="main_color_bg_white">#eee</color>
 </resources>

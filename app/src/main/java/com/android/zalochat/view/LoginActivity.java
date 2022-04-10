@@ -2,8 +2,10 @@ package com.android.zalochat.view;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintSet;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 import com.android.zalochat.MainActivity;
 import com.android.zalochat.R;
 import com.android.zalochat.model.User;
+import com.android.zalochat.util.Constants;
 import com.android.zalochat.util.UtilPassword;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -48,7 +51,11 @@ public class LoginActivity extends AppCompatActivity {
                     User user = snapshot.getValue(User.class);
                     if(UtilPassword.verifyPassword(password,user.getPassword())){
                         if(user.isActive()){
-                            GoToMainActivity(user);
+                            SharedPreferences.Editor prefedit
+                                    = getSharedPreferences(Constants.SHAREPREF_USER,MODE_PRIVATE).edit();
+                            prefedit.putString(Constants.PHONE,users.getKey());
+
+                            GoToMainActivity();
                             Toast.makeText(LoginActivity.this,getString(R.string.login_success),Toast.LENGTH_SHORT).show();
                             finish();
                         }
@@ -74,9 +81,8 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private void GoToMainActivity(User user) {
+    private void GoToMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("FullName",user.getFullname());
         startActivity(intent);
     }
 

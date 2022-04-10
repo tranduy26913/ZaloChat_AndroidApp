@@ -14,4 +14,7 @@
     <string name="wrong_phone">Sai số điện thoại</string>
     <string name="login_success">Đăng nhập thành công</string>
     <string name="user_inactive">Tài khoản chưa kích hoạt</string>
+    <string name="nav_title_message">Tin nhắn</string>
+    <string name="nav_title_phonebook">Danh bạ</string>
+    <string name="nav_title_profile">Hồ sơ</string>
 </resources>
