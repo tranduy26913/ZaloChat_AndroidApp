@@ -6,11 +6,138 @@
     android:layout_height="match_parent"
     android:background="@color/chat_activity_background"
     tools:context=".view.ChatActivity">
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/line1_horizontal"
-        app:layout_constraintGuide_percent="0.5"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:background="@color/zalo_app_bar_color"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="10dp"
+            android:background="@drawable/flag_transparent"
+            android:src="@drawable/ic_baseline_arrow_back_24" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="2"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/txt_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bảo Duy"
+                android:textSize="22dp"
+                android:textColor="@color/white"
+                android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/txt_online_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vừa mới truy cập"
+                android:textColor="@color/online_status_background"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btn_call"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="5dp"
+            android:background="@drawable/flag_transparent"
+            android:src="@drawable/ic_outline_local_phone_24" />
+
+        <ImageButton
+            android:id="@+id/btn_video_call"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="5dp"
+            android:background="@drawable/flag_transparent"
+            android:src="@drawable/ic_outline_videocam_24" />
+
+        <ImageButton
+            android:id="@+id/btn_chat_setting"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="5dp"
+            android:background="@drawable/flag_transparent"
+            android:src="@drawable/ic_baseline_format_list_bulleted_24" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chat_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <ImageButton
+            android:id="@+id/btn_emoji_bottom_sheet"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="10dp"
+            android:background="@color/white"
+            android:src="@drawable/ic_baseline_insert_emoticon_24" />
+
+        <EditText
+            android:id="@+id/txt_body_message"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="2"
+            android:background="@android:color/transparent"
+            android:hint="Tin nhắn" />
+
+        <ImageButton
+            android:id="@+id/btn_more_horizontal"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="5dp"
+            android:background="@color/white"
+            android:src="@drawable/ic_baseline_more_horiz_24" />
+
+        <ImageButton
+            android:id="@+id/btn_rec_sound"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="5dp"
+            android:background="@color/white"
+            android:src="@drawable/ic_baseline_mic_none_24" />
+
+        <ImageButton
+            android:id="@+id/btn_get_image"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="5dp"
+            android:background="@color/white"
+            android:src="@drawable/ic_outline_image_24" />
+
+        <ImageButton
+            android:id="@+id/btn_send"
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="5dp"
+            android:visibility="invisible"
+            android:background="@color/white"
+            android:src="@drawable/ic_baseline_send_24" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
