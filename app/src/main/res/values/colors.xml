@@ -11,4 +11,7 @@
     <color name="txt_color">#333333</color>
     <color name="main_color_bg">#0091ff</color>
     <color name="main_color_bg_white">#eee</color>
+    <color name="chat_activity_background">#F4F5F7</color>
+    <color name="your_message_background">#E5EFFF</color>
+    <color name="zalo_app_bar_color">#0091FF</color>
 </resources>
