@@ -20,6 +20,11 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class EnterCodeOtpActivity extends AppCompatActivity {
 
@@ -49,6 +54,9 @@ public class EnterCodeOtpActivity extends AppCompatActivity {
 signInWithPhoneAuthCredential(credential);
     }
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        //DatabaseReference users = firebaseDatabase.getReference("USERS").child(phonenumber);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -56,7 +64,9 @@ signInWithPhoneAuthCredential(credential);
                         if (task.isSuccessful()) {
                             Toast.makeText(EnterCodeOtpActivity.this,"Xác thực thành công",Toast.LENGTH_SHORT).show();
                             FirebaseUser user = task.getResult().getUser();
+                            ActiveUser(phonenumber);
                             GoToLogin(phonenumber);
+                            finish();
                         } else {
                             // Sign in failed, display a message and update the UI
 
@@ -66,6 +76,26 @@ signInWithPhoneAuthCredential(credential);
                         }
                     }
                 });
+    }
+
+    private void ActiveUser(String phonenumber) {
+
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference users = firebaseDatabase.getReference("USERS").child(phonenumber);
+        users.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getValue()!=null){
+                    firebaseDatabase.getReference("USERS").child(phonenumber).child("active").setValue(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     private void GoToLogin(String phonenumber){

@@ -6,5 +6,12 @@
     <string name="send_code_to_activate_fail">Gửi mã kích hoạt thất bại</string>
     <string name="login">Đăng nhập</string>
     <string name="register">Đăng ký</string>
-    <string name="forget_password">Quên mật khẩu</string>
+    <string name="forget_password">Quên mật khẩu?</string>
+    <string name="name_register">Họ và tên</string>
+    <string name="goto_login">Nếu bạn đã có tài khoản. Nhấn vào đây để đăng nhập</string>
+    <string name="login_false">Đăng nhập thất bại</string>
+    <string name="wrong_password">Sai mật khẩu</string>
+    <string name="wrong_phone">Sai số điện thoại</string>
+    <string name="login_success">Đăng nhập thành công</string>
+    <string name="user_inactive">Tài khoản chưa kích hoạt</string>
 </resources>

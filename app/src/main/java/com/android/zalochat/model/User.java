@@ -4,9 +4,34 @@ public class User {
     protected String userId;
     protected String phone;
     protected String password;
-    protected String firstname="";
-    protected String lastname="";
-    protected String avatar="";
+    protected String fullname = "";
+    protected String avatar = "";
+    protected boolean active = false;
+    protected boolean online = true;
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
 
     public String getUserId() {
         return userId;
@@ -32,21 +57,6 @@ public class User {
         this.password = password;
     }
 
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
 
     public String getAvatar() {
         return avatar;
@@ -56,12 +66,14 @@ public class User {
         this.avatar = avatar;
     }
 
-    public User(){
+    public User() {
 
     }
-    public User(String phone,String password){
+
+    public User(String phone, String password, String fullname) {
         this.phone = phone;
         this.password = password;
         this.userId = phone;
+        this.fullname = fullname;
     }
 }

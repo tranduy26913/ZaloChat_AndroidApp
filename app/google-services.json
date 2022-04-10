@@ -8,14 +8,14 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:37691525458:android:95c324c3a5f8d07b9dd28b",
+        "mobilesdk_app_id": "1:37691525458:android:1baa7d05bd7c91539dd28b",
         "android_client_info": {
           "package_name": "com.android.zalochat"
         }
       },
       "oauth_client": [
         {
-          "client_id": "37691525458-lvofd0qqckdf6mg25q6mvrm2jvhebfla.apps.googleusercontent.com",
+          "client_id": "37691525458-bkkcuupcbmuvv2u5s28nea18naicuiml.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.android.zalochat",
@@ -29,7 +29,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA3d9ab4LLNAxiirSi_5gmeHqdDgaYBdRQ"
+          "current_key": "AIzaSyDpTtC58jkL0umkr8IyVp03Yji30qZPQCQ"
         }
       ],
       "services": {

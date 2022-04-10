@@ -14,8 +14,8 @@ import android.widget.Toast;
 import com.android.zalochat.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseException;
-import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -23,42 +23,48 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.hbb20.CountryCodePicker;
 
 import java.util.concurrent.TimeUnit;
 
 public class VerifyPhoneActivity extends AppCompatActivity {
-Button btnSendCode;
-EditText txtPhone;
-
+    Button btnSendCode;
+    EditText txtPhone;
+    CountryCodePicker ccp;
     private static final String TAG = "PhoneAuthActivity";
 
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private String mVerificationId;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_phone);
         btnSendCode = findViewById(R.id.btnSendCode);
         txtPhone = findViewById(R.id.txtPhone);
+        ccp =findViewById(R.id.ccp);
         getDataFromIntent();
+        mAuth = FirebaseAuth.getInstance();
     }
-private void getDataFromIntent(){
+
+    private void getDataFromIntent() {
         String phonenumber = getIntent().getStringExtra("phonenumber");
         txtPhone.setText(phonenumber);
-}
-    private void SetEvent(){
+    }
+
+    private void SetEvent() {
 
     }
 
-    public void onClickVerify(View view){
-
+    public void onClickVerify(View view) {
+        String phonenumber = ccp.getDefaultCountryCodeWithPlus()+txtPhone.getText().toString().trim();
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             @Override
             public void onVerificationCompleted(PhoneAuthCredential credential) {
-                                Log.d(TAG, "onVerificationCompleted:" + credential);
+                Log.d(TAG, "onVerificationCompleted:" + credential);
                 signInWithPhoneAuthCredential(credential);
             }
 
@@ -66,7 +72,7 @@ private void getDataFromIntent(){
             public void onVerificationFailed(FirebaseException e) {
 
                 Log.w(TAG, "onVerificationFailed", e);
-                Toast.makeText(VerifyPhoneActivity.this,getString(R.string.send_code_to_activate_fail),Toast.LENGTH_SHORT).show();
+                Toast.makeText(VerifyPhoneActivity.this, getString(R.string.send_code_to_activate_fail), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -76,21 +82,20 @@ private void getDataFromIntent(){
                 Log.d(TAG, "onCodeSent:" + verificationId);
                 mVerificationId = verificationId;
                 mResendToken = token;
-                GoToEnterCodeOtp(verificationId,txtPhone.getText().toString());
+                GoToEnterCodeOtp(verificationId, phonenumber);
             }
 
 
         };
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(mAuth)
-                        .setPhoneNumber("+84"+txtPhone.getText().toString().substring(1))       // Phone number to verify
+                        .setPhoneNumber(phonenumber)       // Phone number to verify
                         .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
                         .setActivity(this)                 // Activity (for callback binding)
                         .setCallbacks(mCallbacks)          // OnVerificationStateChangedCallbacks
                         .build();
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
-
 
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
@@ -114,10 +119,11 @@ private void getDataFromIntent(){
                     }
                 });
     }
-    private void GoToEnterCodeOtp(String verificationId,String phonenumber) {
-        Intent intent = new Intent(this,EnterCodeOtpActivity.class);
-        intent.putExtra("verificationId",verificationId);
-        intent.putExtra("phonenumber",phonenumber);
+
+    private void GoToEnterCodeOtp(String verificationId, String phonenumber) {
+        Intent intent = new Intent(this, EnterCodeOtpActivity.class);
+        intent.putExtra("verificationId", verificationId);
+        intent.putExtra("phonenumber", phonenumber);
         startActivity(intent);
     }
 }
