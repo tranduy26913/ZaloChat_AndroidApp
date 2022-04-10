@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ZaloChat</string>
+    <string name="app_name">Zalo</string>
     <string name="phone">Số điện thoại</string>
     <string name="password">Mật khẩu</string>
     <string name="send_code_to_activate">Gửi mã kích hoạt</string>
