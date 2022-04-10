@@ -13,7 +13,12 @@
         android:layout_height="0dp"
         android:layout_gravity="bottom"
         android:background="@color/main_color_bg_white"
+        android:keepScreenOn="false"
+        app:chainUseRtl="true"
+        app:itemHorizontalTranslationEnabled="true"
         app:itemIconTint="@color/bnv_tab_item_foreground"
+        app:itemPaddingBottom="8dp"
+        app:itemPaddingTop="8dp"
         app:itemTextColor="@color/bnv_tab_item_foreground"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -27,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_end="65dp" />
+        app:layout_constraintGuide_end="50dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineTop"

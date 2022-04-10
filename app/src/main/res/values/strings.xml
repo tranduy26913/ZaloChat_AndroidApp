@@ -17,4 +17,6 @@
     <string name="nav_title_message">Tin nhắn</string>
     <string name="nav_title_phonebook">Danh bạ</string>
     <string name="nav_title_profile">Hồ sơ</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
