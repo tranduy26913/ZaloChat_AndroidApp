@@ -14,6 +14,8 @@
         android:layout_gravity="bottom"
         android:background="@color/main_color_bg_white"
         app:itemIconTint="@color/bnv_tab_item_foreground"
+        app:itemPaddingBottom="8dp"
+        app:itemPaddingTop="8dp"
         app:itemTextColor="@color/bnv_tab_item_foreground"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -27,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_end="65dp" />
+        app:layout_constraintGuide_end="55dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineTop"
@@ -66,14 +68,6 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineTop"
-        app:layout_constraintVertical_bias="0.0" >
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button"
-            android:onClick="chatPage"/>
-    </FrameLayout>
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

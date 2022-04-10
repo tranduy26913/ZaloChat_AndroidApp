@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintSet;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -37,6 +38,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onClickLogin(View view) {
+        ProgressDialog progress = new ProgressDialog(this);
+        progress.setMessage("Đang đăng nhập...");
+        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+        progress.show();
+// To dismiss the dialog
 
         String phone =ccp.getDefaultCountryCodeWithPlus()+ txtPhoneLogin.getText().toString().trim();
         String password= txtPasswordLogin.getText().toString();
@@ -54,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                             SharedPreferences.Editor prefedit
                                     = getSharedPreferences(Constants.SHAREPREF_USER,MODE_PRIVATE).edit();
                             prefedit.putString(Constants.PHONE,users.getKey());
-
+                            progress.dismiss();
                             GoToMainActivity();
                             Toast.makeText(LoginActivity.this,getString(R.string.login_success),Toast.LENGTH_SHORT).show();
                             finish();

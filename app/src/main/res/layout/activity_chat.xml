@@ -135,9 +135,9 @@
             android:layout_height="24dp"
             android:layout_gravity="center_vertical"
             android:layout_margin="5dp"
-            android:visibility="invisible"
             android:background="@color/white"
-            android:src="@drawable/ic_baseline_send_24" />
+            android:src="@drawable/ic_baseline_send_24"
+            android:visibility="invisible" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

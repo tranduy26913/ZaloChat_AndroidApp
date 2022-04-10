@@ -27,7 +27,14 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
         addControl();
         addEvent();
+        loadDataIntent();
     }
+
+    private void loadDataIntent() {
+        String fullname=getIntent().getStringExtra("fullname");
+        txtUserName.setText(fullname);
+    }
+
 
     private void addEvent() {
         txtBodyMessage.addTextChangedListener(new TextWatcher() {

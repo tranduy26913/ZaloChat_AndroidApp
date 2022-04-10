@@ -1,60 +1,58 @@
 package com.android.zalochat.view.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.android.zalochat.R;
+import com.android.zalochat.adapter.UserChatAdapter;
+import com.android.zalochat.event.IClickItemUserChatListener;
+import com.android.zalochat.mapping.UserMapping;
+import com.android.zalochat.model.User;
+import com.android.zalochat.model.payload.UserChat;
+import com.android.zalochat.view.ChatActivity;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MessageFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class MessageFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private RecyclerView recyclerViewUserChat;
 
     public MessageFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MessageFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MessageFragment newInstance(String param1, String param2) {
-        MessageFragment fragment = new MessageFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        recyclerViewUserChat = view.findViewById(R.id.recyclerViewUserChat);
+        LoadUserChat();
     }
 
     @Override
@@ -62,5 +60,50 @@ public class MessageFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_message, container, false);
+    }
+
+    private void LoadUserChat(){
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        // truy vấn vào nhánh username mà người dùng nhập
+        DatabaseReference users = firebaseDatabase.getReference("USERS");
+
+        users.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<HashMap<String, User>> objectsGTypeInd =
+                        new GenericTypeIndicator<HashMap<String, User>>() {
+                        };
+                Map<String, User> objectHashMap = dataSnapshot.getValue(objectsGTypeInd);
+                final List<User> objectArrayList = new ArrayList<>(objectHashMap.values());
+                final List<UserChat> userChatList = new ArrayList<>();
+                for (User user: objectArrayList ) {
+                    userChatList.add(UserMapping.EntityToUserchat(user,"Hãy bắt đầu gửi tin nhắn đầu tiên"));
+                }
+                UserChatAdapter userChatAdapter = new UserChatAdapter(userChatList, new IClickItemUserChatListener() {
+                    @Override
+                    public void onClickItemUserChat(UserChat userChat) {
+                        GoToChatActivity(userChat);
+                    }
+                });
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+                recyclerViewUserChat.setAdapter(userChatAdapter);
+                recyclerViewUserChat.setLayoutManager(linearLayoutManager);
+                recyclerViewUserChat.setHasFixedSize(true);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void GoToChatActivity(UserChat userChat) {
+        Intent intent = new Intent(this.getContext(), ChatActivity.class);
+        intent.putExtra("phone",userChat.getPhone());
+        intent.putExtra("fullname",userChat.getFullname());
+        startActivity(intent);
     }
 }
