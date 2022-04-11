@@ -3,23 +3,29 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/drawable/circle.xml" value="0.197" />
-        <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/activity_chat.xml" value="0.2" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/activity_enter_code_otp.xml" value="0.16168478260869565" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/activity_register.xml" value="0.18" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/activity_verify_phone.xml" value="0.2" />
-        <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/fragment_message.xml" value="0.184375" />
+        <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/fragment_message.xml" value="0.1" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/fragment_phone_book.xml" value="0.1" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/fragment_profile.xml" value="0.1" />
-        <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/item_user_chat.xml" value="0.33" />
         <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.17777777777777778" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_baseline_format_list_bulleted_24.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_baseline_insert_emoticon_24.xml" value="0.26614583333333336" />
         <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_baseline_lock_24.xml" value="0.1712962962962963" />
-        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/layout/activity_chat.xml" value="0.2359375" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_baseline_more_horiz_24.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_baseline_person_24.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_baseline_send_24.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_baseline_videocam_24.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_outline_local_phone_24.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_outline_videocam_24.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/layout/activity_chat.xml" value="0.1" />
         <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/layout/activity_enter_code_otp.xml" value="0.16893115942028986" />
-        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/layout/activity_login.xml" value="0.12158054711246201" />
-        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/layout/activity_main.xml" value="0.16893115942028986" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/layout/activity_login.xml" value="0.264" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/layout/activity_register.xml" value="0.16893115942028986" />
         <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.17407407407407408" />
       </map>

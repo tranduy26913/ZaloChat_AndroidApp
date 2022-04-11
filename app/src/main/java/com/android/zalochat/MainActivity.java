@@ -19,28 +19,26 @@ import com.google.android.material.navigation.NavigationBarView;
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigation;
-    private NavigationBarView.OnItemSelectedListener navListener = new NavigationBarView.OnItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment selectedFragment;
-            switch (item.getItemId()){
-                case R.id.miMessage: {
-                    selectedFragment = new MessageFragment();
-                    break;
-                }
-                case R.id.miPhonebook: {
-                    selectedFragment = new PhoneBookFragment();
-                    break;
-                }
-                default:
-                    selectedFragment = new ProfileFragment();
-                    break;
-
+    //new NavigationBarView.OnItemSelectedListener()
+    private NavigationBarView.OnItemSelectedListener navListener = item -> {
+        Fragment selectedFragment;
+        switch (item.getItemId()){
+            case R.id.miMessage: {
+                selectedFragment = new MessageFragment();
+                break;
             }
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frameLayoutMain,selectedFragment).commit();
-            return true;
+            case R.id.miPhonebook: {
+                selectedFragment = new PhoneBookFragment();
+                break;
+            }
+            default:
+                selectedFragment = new ProfileFragment();
+                break;
+
         }
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frameLayoutMain,selectedFragment).commit();
+        return true;
     };
 
     @Override
@@ -53,8 +51,4 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void chatPage(View view) {
-        Intent intent=new Intent(MainActivity.this, ChatActivity.class);
-        startActivity(intent);
-    }
 }
