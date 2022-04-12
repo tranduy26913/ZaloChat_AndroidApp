@@ -60,6 +60,8 @@ public class LoginActivity extends AppCompatActivity {
                             SharedPreferences.Editor prefedit
                                     = getSharedPreferences(Constants.SHAREPREF_USER,MODE_PRIVATE).edit();
                             prefedit.putString(Constants.PHONE,users.getKey());
+                            prefedit.putString("AVATAR",user.getAvatar());
+                            prefedit.apply();
                             progress.dismiss();
                             GoToMainActivity();
                             Toast.makeText(LoginActivity.this,getString(R.string.login_success),Toast.LENGTH_SHORT).show();

@@ -1,6 +1,9 @@
 package com.android.zalochat.view.fragment;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,6 +24,7 @@ import com.android.zalochat.event.IClickItemUserChatListener;
 import com.android.zalochat.mapping.UserMapping;
 import com.android.zalochat.model.User;
 import com.android.zalochat.model.payload.UserChat;
+import com.android.zalochat.util.Constants;
 import com.android.zalochat.view.ChatActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,7 +41,7 @@ import java.util.Map;
 public class MessageFragment extends Fragment {
 
     private RecyclerView recyclerViewUserChat;
-
+private String userId;
     public MessageFragment() {
         // Required empty public constructor
     }
@@ -52,6 +56,8 @@ public class MessageFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerViewUserChat = view.findViewById(R.id.recyclerViewUserChat);
+        SharedPreferences ref = view.getContext().getSharedPreferences(Constants.SHAREPREF_USER, MODE_PRIVATE);
+        userId = ref.getString(Constants.PHONE, "");
         LoadUserChat();
     }
 
@@ -77,7 +83,8 @@ public class MessageFragment extends Fragment {
                 final List<User> objectArrayList = new ArrayList<>(objectHashMap.values());
                 final List<UserChat> userChatList = new ArrayList<>();
                 for (User user: objectArrayList ) {
-                    userChatList.add(UserMapping.EntityToUserchat(user,"Hãy bắt đầu gửi tin nhắn đầu tiên"));
+                    if(!user.getUserId().equals(userId))
+                        userChatList.add(UserMapping.EntityToUserchat(user,"Hãy bắt đầu gửi tin nhắn đầu tiên"));
                 }
                 UserChatAdapter userChatAdapter = new UserChatAdapter(userChatList, new IClickItemUserChatListener() {
                     @Override
@@ -104,6 +111,7 @@ public class MessageFragment extends Fragment {
         Intent intent = new Intent(this.getContext(), ChatActivity.class);
         intent.putExtra("phone",userChat.getPhone());
         intent.putExtra("fullname",userChat.getFullname());
+        intent.putExtra("avatar",userChat.getAvatar());
         startActivity(intent);
     }
 }
