@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.JsonWriter;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -25,6 +26,7 @@ import com.android.zalochat.adapter.MessageAdapter;
 import com.android.zalochat.mapping.MessageMapping;
 import com.android.zalochat.model.Chat;
 import com.android.zalochat.model.Message;
+import com.android.zalochat.model.User;
 import com.android.zalochat.model.payload.MessageChat;
 import com.android.zalochat.util.Constants;
 import com.android.zalochat.util.Util;
@@ -34,8 +36,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import org.json.JSONObject;
+import org.json.JSONStringer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,24 +53,24 @@ public class ChatActivity extends AppCompatActivity {
     TextView txtUserName, txtOnlineStatus;
     EditText txtBodyMessage;
     LinearLayout chat_bar;
-    String chatId,avatarUrl;
-    String userId, fuserId;
+    String chatId;
+    User userOwn, friendUser;
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     RecyclerView recyclerViewMessageChat;
     Bitmap myAvatar, friendAvatar;
     List<MessageChat> messageList;
-
+    private SharedPreferences pref;
+    final Gson gson =new Gson();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         addControl();
         addEvent();
-
-        SharedPreferences ref = getSharedPreferences(Constants.SHAREPREF_USER, MODE_PRIVATE);
-        userId = ref.getString(Constants.PHONE, "");
-        avatarUrl = ref.getString("AVATAR","");
-        Picasso.get().load(avatarUrl).into(new Target() {
+        pref = getSharedPreferences(Constants.SHAREPREF_USER, MODE_PRIVATE);
+        String userOwnJson = pref.getString(Constants.USER_JSON, "");//lấy json user từ share pref
+        userOwn = gson.fromJson(userOwnJson,User.class);//parse sang class User
+        Picasso.get().load(userOwn.getAvatar()).into(new Target() {//Load ảnh avatar
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 myAvatar = bitmap;
@@ -83,12 +89,10 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void loadDataIntent() {
-        String fullname = getIntent().getStringExtra("fullname");
-        String phone = getIntent().getStringExtra("phone");
-        fuserId = phone;
-        txtUserName.setText(fullname);
-        String avatar = getIntent().getStringExtra("avatar");
-        Picasso.get().load(avatar).into(new Target() {
+        String userJson = getIntent().getStringExtra(Constants.USER_JSON);
+        friendUser = gson.fromJson(userJson,User.class);
+        txtUserName.setText(friendUser.getFullname());
+        Picasso.get().load(friendUser.getAvatar()).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 friendAvatar = bitmap;
@@ -110,14 +114,13 @@ public class ChatActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Chat chat = snapshot.getValue(Chat.class);
-                        if (chat.getSender().equals(userId) && chat.getReceiver().equals(fuserId)) {
+                        if (chat.getSender().equals(userOwn.getUserId()) && chat.getReceiver().equals(friendUser.getUserId())) {
                             chatId = chat.getId();
 
-                        } else if (chat.getSender().equals(fuserId) && chat.getReceiver().equals(userId)) {
+                        } else if (chat.getSender().equals(friendUser.getUserId()) && chat.getReceiver().equals(userOwn.getUserId())) {
                             chatId = chat.getId();
                         }
                     }
-                    Toast.makeText(ChatActivity.this,chatId,Toast.LENGTH_SHORT).show();
                     if(!chatId.equals(""))
                         LoadMessage();//tạm thời để ở đây
                 }
@@ -202,20 +205,22 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void onClickSendMessage() {
+        Chat chat;
         if (chatId.equals("")) {
-            chatId = userId.concat(fuserId);
-            Chat chat = new Chat(chatId, userId, fuserId, (new Date()).getTime(), "Tin nhắn đầu tiên");
+            chatId = userOwn.getUserId().concat(friendUser.getUserId());
+            chat = new Chat(chatId, userOwn.getUserId(), friendUser.getUserId(), (new Date()).getTime(), "Tin nhắn đầu tiên");
             database.getReference("CHATS").child(chatId).setValue(chat);
             LoadMessage();
         }
         UUID uuid =  UUID.randomUUID();
-        Message message = new Message(uuid.toString(), userId, fuserId, txtBodyMessage.getText().toString(),
+        Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), txtBodyMessage.getText().toString(),
                 new Date().getTime(),"Like","text");
+
         DatabaseReference ref = database.getReference("MESSAGES");
         ref.child(chatId).child(String.valueOf(message.getTime())).setValue(message);
         txtBodyMessage.setText("");
-
         LoadMessage();
+
     }
 
     private void LoadMessage(){
@@ -228,7 +233,7 @@ public class ChatActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot:dataSnapshot.getChildren() ) {
                     Message message = snapshot.getValue(Message.class);
                     MessageChat messageChat;
-                    if(message.getSender().equals(userId))//nếu là người gửi là mình
+                    if(message.getSender().equals(userOwn.getUserId()))//nếu là người gửi là mình
                     {
                          messageChat= MessageMapping.EntityToMessageChat(message,myAvatar);
                     }

@@ -12,6 +12,7 @@ public class UserMapping {
         userChat.setFullname(user.getFullname());
         userChat.setPhone(user.getPhone());
         userChat.setMessage(message);
+        userChat.setUserId(user.getUserId());
         return userChat;
     }
 }

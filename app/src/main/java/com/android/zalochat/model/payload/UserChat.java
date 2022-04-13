@@ -5,6 +5,15 @@ public class UserChat {
     private String fullname;
     private String message;
     private String phone;
+    private String userId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public String getAvatar() {
         return avatar;

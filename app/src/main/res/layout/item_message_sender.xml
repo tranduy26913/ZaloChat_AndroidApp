@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="2dp"
     android:layout_marginBottom="2dp"
+    android:layout_marginEnd="10dp"
     android:layout_marginStart="120dp"
     android:background="@drawable/flag_transparent"
     app:layout_constraintEnd_toEndOf="parent"
@@ -29,17 +30,19 @@
         android:id="@+id/tvMessageContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:layout_marginRight="10dp"
+        android:layout_marginStart="10dp"
         android:background="@drawable/bg_mes_sender_rounded_corner"
         android:padding="8dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:text="Message content"
+        android:text="Message tttttttttttttttttttttttttttttttttttttt"
         android:textColor="@color/txt_color"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

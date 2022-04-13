@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 import com.hbb20.CountryCodePicker;
 
 public class LoginActivity extends AppCompatActivity {
@@ -59,8 +60,10 @@ public class LoginActivity extends AppCompatActivity {
                         if(user.isActive()){
                             SharedPreferences.Editor prefedit
                                     = getSharedPreferences(Constants.SHAREPREF_USER,MODE_PRIVATE).edit();
-                            prefedit.putString(Constants.PHONE,users.getKey());
-                            prefedit.putString("AVATAR",user.getAvatar());
+                            Gson gson = new Gson();
+                            String jsonUser = gson.toJson(user);
+                            prefedit.putString(Constants.USERID,user.getUserId());
+                            prefedit.putString(Constants.USER_JSON,jsonUser);
                             prefedit.apply();
                             progress.dismiss();
                             GoToMainActivity();
@@ -79,11 +82,13 @@ public class LoginActivity extends AppCompatActivity {
                 else {
                     Toast.makeText(LoginActivity.this,getString(R.string.wrong_phone),Toast.LENGTH_SHORT).show();
                 }
+                progress.dismiss();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(LoginActivity.this,getString(R.string.login_false),Toast.LENGTH_SHORT).show();
+                progress.dismiss();
             }
         });
 

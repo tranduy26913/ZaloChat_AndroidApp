@@ -45,7 +45,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
     public void onBindViewHolder(@NonNull MessageHolder holder, int position) {
         MessageChat messageChat = messageList.get(position);
         holder.tvMessageContent.setText(messageChat.getMessage().getContent());
-        holder.imgAvatarMessage.setImageBitmap(messageChat.getAvatar());
+        if(position>0){//xử lý trường hợp những tin nhắn liên tiếp sẽ chỉ hiện avatar 1 lần
+            if(messageChat.getMessage().getReceiver().equals(messageList.get(position-1).getMessage().getReceiver())){
+                holder.imgAvatarMessage.setVisibility(View.INVISIBLE);
+            }
+            else {
+                holder.imgAvatarMessage.setImageBitmap(messageChat.getAvatar());
+            }
+        }
+        else {
+            holder.imgAvatarMessage.setImageBitmap(messageChat.getAvatar());
+        }
+
+
     }
 
 
@@ -57,7 +69,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
     @Override
     public int getItemViewType(int position) {
         SharedPreferences ref = context.getSharedPreferences(Constants.SHAREPREF_USER,Context.MODE_PRIVATE);
-        String userId= ref.getString(Constants.PHONE,"");
+        String userId= ref.getString(Constants.USERID,"");
         if(messageList.get(position).getMessage().getSender().equals(userId)){
             return MSG_SENDER;
         }

@@ -32,7 +32,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +43,7 @@ import java.util.Map;
 public class MessageFragment extends Fragment {
 
     private RecyclerView recyclerViewUserChat;
-private String userId;
+    private User userOwn;//Tài khoản của mình
     public MessageFragment() {
         // Required empty public constructor
     }
@@ -57,7 +59,13 @@ private String userId;
         super.onViewCreated(view, savedInstanceState);
         recyclerViewUserChat = view.findViewById(R.id.recyclerViewUserChat);
         SharedPreferences ref = view.getContext().getSharedPreferences(Constants.SHAREPREF_USER, MODE_PRIVATE);
-        userId = ref.getString(Constants.PHONE, "");
+        String jsonUser = ref.getString(Constants.USER_JSON, "");
+        try {
+            Gson gson  = new Gson();
+            userOwn = gson.fromJson(jsonUser,User.class);
+        }catch (Exception ex) {
+            //GotoLogin();
+        }
         LoadUserChat();
     }
 
@@ -83,7 +91,7 @@ private String userId;
                 final List<User> objectArrayList = new ArrayList<>(objectHashMap.values());
                 final List<UserChat> userChatList = new ArrayList<>();
                 for (User user: objectArrayList ) {
-                    if(!user.getUserId().equals(userId))
+                    if(!user.getUserId().equals(userOwn.getUserId()))
                         userChatList.add(UserMapping.EntityToUserchat(user,"Hãy bắt đầu gửi tin nhắn đầu tiên"));
                 }
                 UserChatAdapter userChatAdapter = new UserChatAdapter(userChatList, new IClickItemUserChatListener() {
@@ -109,9 +117,9 @@ private String userId;
 
     private void GoToChatActivity(UserChat userChat) {
         Intent intent = new Intent(this.getContext(), ChatActivity.class);
-        intent.putExtra("phone",userChat.getPhone());
-        intent.putExtra("fullname",userChat.getFullname());
-        intent.putExtra("avatar",userChat.getAvatar());
+        Gson gson = new Gson();
+        String userChatJson = gson.toJson(userChat);
+        intent.putExtra(Constants.USER_JSON,userChatJson);
         startActivity(intent);
     }
 }
