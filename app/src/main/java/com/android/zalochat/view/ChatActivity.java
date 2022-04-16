@@ -1,21 +1,36 @@
 package com.android.zalochat.view;
 
+import static android.view.View.GONE;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.JsonWriter;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -31,11 +46,18 @@ import com.android.zalochat.model.payload.MessageChat;
 import com.android.zalochat.util.Constants;
 import com.android.zalochat.util.Util;
 import com.google.android.gms.common.util.JsonUtils;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -43,6 +65,8 @@ import com.squareup.picasso.Target;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -53,13 +77,19 @@ public class ChatActivity extends AppCompatActivity {
     TextView txtUserName, txtOnlineStatus;
     EditText txtBodyMessage;
     LinearLayout chat_bar;
+    ConstraintLayout layoutImgSendMessage;
+    ImageView imgSendMessage;
     String chatId;
     User userOwn, friendUser;
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     RecyclerView recyclerViewMessageChat;
     Bitmap myAvatar, friendAvatar;
-    List<MessageChat> messageList;
+    List<MessageChat> messageList = new ArrayList<MessageChat>();
+    MessageAdapter messageAdapter = new MessageAdapter(messageList,ChatActivity.this);
     private SharedPreferences pref;
+    private Uri fileImageSend;
+    private UploadTask uploadTask;
+    int SELECT_PICTURE = 200;
     final Gson gson =new Gson();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,6 +211,12 @@ public class ChatActivity extends AppCompatActivity {
                 onClickSendMessage();
             }
         });
+        btnGetImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageChooser();
+            }
+        });
 
     }
 
@@ -199,6 +235,8 @@ public class ChatActivity extends AppCompatActivity {
         txtBodyMessage = findViewById(R.id.txt_body_message);
         chat_bar = findViewById(R.id.chat_bar);
         recyclerViewMessageChat = findViewById(R.id.recyclerViewMessageChat);
+        layoutImgSendMessage = findViewById(R.id.layoutImgSendMessage);
+        imgSendMessage = findViewById(R.id.imgSendMessage);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         recyclerViewMessageChat.setLayoutManager(layoutManager);
@@ -213,23 +251,57 @@ public class ChatActivity extends AppCompatActivity {
             LoadMessage();
         }
         UUID uuid =  UUID.randomUUID();
-        Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), txtBodyMessage.getText().toString(),
-                new Date().getTime(),"Like","text");
+        if(layoutImgSendMessage.getVisibility()==View.VISIBLE){//upload ảnh
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference().child("IMAGES");
+            StorageReference filePath = storageRef.child(uuid.toString());
 
-        DatabaseReference ref = database.getReference("MESSAGES");
-        ref.child(chatId).child(String.valueOf(message.getTime())).setValue(message);
-        txtBodyMessage.setText("");
-        LoadMessage();
+
+            uploadTask = filePath.putFile(fileImageSend);
+            uploadTask.continueWithTask(new Continuation() {
+                @Override
+                public Object then(@NonNull Task task) throws Exception {
+                    if(!task.isSuccessful()){
+                        throw task.getException();
+                    }
+                    return filePath.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener() {
+                @Override
+                public void onComplete(@NonNull Task task) {
+                    if(task.isSuccessful()){
+                        String path =  task.getResult().toString();
+                        Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), path,
+                                new Date().getTime(),"LIKE",Constants.IMAGE);
+                        DatabaseReference ref = database.getReference("MESSAGES");
+                        ref.child(chatId).child(String.valueOf(message.getTime())).setValue(message);
+
+                    }
+                }
+            });
+            txtBodyMessage.setText("");
+            imgSendMessage = null;
+            fileImageSend = null;
+            layoutImgSendMessage.setVisibility(GONE);
+        }
+        else {
+            Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), txtBodyMessage.getText().toString(),
+                    new Date().getTime(),"LIKE",Constants.TEXT);
+            DatabaseReference ref = database.getReference("MESSAGES");
+            ref.child(chatId).child(String.valueOf(message.getTime())).setValue(message);
+            txtBodyMessage.setText("");
+        }
+
 
     }
 
     private void LoadMessage(){
-        messageList = new ArrayList<>();
         DatabaseReference reference = database.getReference("MESSAGES").child(chatId);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 messageList.clear();
+                Log.d("LoadMessage","Data change");
                 for (DataSnapshot snapshot:dataSnapshot.getChildren() ) {
                     Message message = snapshot.getValue(Message.class);
                     MessageChat messageChat;
@@ -243,8 +315,11 @@ public class ChatActivity extends AppCompatActivity {
                     messageList.add(messageChat);
 
                 }
-                MessageAdapter messageAdapter = new MessageAdapter(messageList,ChatActivity.this);
+                recyclerViewMessageChat.setHasFixedSize(true);
                 recyclerViewMessageChat.setAdapter(messageAdapter);
+                recyclerViewMessageChat.setItemViewCacheSize(50);
+                recyclerViewMessageChat.setDrawingCacheEnabled(true);
+                recyclerViewMessageChat.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
             }
 
             @Override
@@ -253,7 +328,87 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        reference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Log.d("LoadMessage","Data add");
+                Message message =snapshot.getValue(Message.class);
+                MessageChat messageChat;
+                if(message.getSender().equals(userOwn.getUserId()))//nếu là người gửi là mình
+                {
+                    messageChat= MessageMapping.EntityToMessageChat(message,myAvatar);
+                }
+                else {
+                    messageChat = MessageMapping.EntityToMessageChat(message,friendAvatar);
+                }
+                messageList.add(messageChat);
+                messageAdapter.notifyDataSetChanged();
+                recyclerViewMessageChat.smoothScrollToPosition(messageList.size());
+            }
 
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
+    void imageChooser() {
+
+        Intent i = new Intent();
+        i.setType("image/*");
+        i.setAction(Intent.ACTION_GET_CONTENT);
+        mStartForResult.launch(Intent.createChooser(i, "Select Picture"));
+    }
+
+
+
+    ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent intent = result.getData();
+                            fileImageSend = intent.getData();
+                            if (null != fileImageSend) {
+                                InputStream imageStream = null;
+                                try {
+                                    imageStream = getContentResolver().openInputStream(fileImageSend);
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+                                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                                imgSendMessage.setImageBitmap(selectedImage);
+                                layoutImgSendMessage.setVisibility(View.VISIBLE);
+
+                                btnSend.getLayoutParams().width = 60;
+                                btnMoreHoz.setVisibility(GONE);
+                                btnRecSound.setVisibility(GONE);
+                                btnGetImage.setVisibility(GONE);
+                                btnSend.setVisibility(View.VISIBLE);
+                            }
+
+                    }
+                }
+            });
+
+    public void onClickCancelSendImage(View view) {
+        imgSendMessage.setImageBitmap(null);
+        layoutImgSendMessage.setVisibility(GONE);
+    }
 }

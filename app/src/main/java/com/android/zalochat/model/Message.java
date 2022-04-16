@@ -70,15 +70,6 @@ public class Message {
     public Message() {
 
     }
-//    public Message(String id,String sender,String receiver,String content){
-//        this.id=id;
-//        this.sender=sender;
-//        this.receiver=receiver;
-//        this.content=content;
-//        this.reaction ="like";
-//        this.time = new Date().getTime();
-//        this.type = "text";
-//    }
 
     public Message(String id, String sender, String receiver, String content, long time, String reaction, String type) {
         this.id = id;
@@ -88,5 +79,8 @@ public class Message {
         this.reaction = reaction;
         this.time = time;
         this.type = type;
+
+
     }
+
 }

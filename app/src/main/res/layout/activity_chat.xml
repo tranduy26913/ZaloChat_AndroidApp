@@ -146,10 +146,47 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:paddingBottom="10dp"
+
         app:layout_constraintTop_toBottomOf="@id/chat_bar_top"
         app:layout_constraintBottom_toTopOf="@id/chat_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@color/chat_activity_background"/>
+        android:background="@color/chat_activity_background">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutImgSendMessage"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:padding="5dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/chat_bar"
+        android:background="@color/white"
+        android:visibility="gone"
+        >
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+           android:minWidth="35dp"
+            android:minHeight="35dp"
+            android:onClick="onClickCancelSendImage"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@drawable/ic_baseline_close_24"
+            />
+
+        <ImageView
+            android:id="@+id/imgSendMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="fitStart"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
