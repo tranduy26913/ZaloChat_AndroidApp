@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UserInfoActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="-16dp"
+        tools:layout_editor_absoluteY="-72dp">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="0dp"
+                    android:background="@drawable/my_custom_background"
+                    android:orientation="horizontal"
+                    android:id="@+id/BackInfo">
+                    >
+
+                    <TextView
+                        android:id="@+id/iconBackInfo"
+                        android:layout_width="98dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/zalo_app_bar_color"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="20dp"
+                        android:text="&lt;"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/txtTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/zalo_app_bar_color"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="0dp"
+                        android:text="Tài khoản"
+                        android:textAlignment="center"
+                        android:textSize="20sp"
+                        tools:ignore="RtlCompat" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="282dp"
+                    android:background="@drawable/background"
+                    android:orientation="vertical"
+                    tools:layout_editor_absoluteX="-16dp"
+                    tools:layout_editor_absoluteY="-72dp">
+
+                    <TextView
+                        android:id="@+id/textViewNameUser"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="10dp"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center"
+                        android:text="Hiếu Đan"
+                        android:textSize="20sp" />
+
+                    <ImageView
+                        android:layout_width="119dp"
+                        android:layout_height="106dp"
+                        android:background="@drawable/icon_user"
+                        android:layout_gravity="center"
+                        android:scaleType="center"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="0dp"
+                    android:background="@drawable/my_custom_background"
+                    android:orientation="horizontal"
+                    android:id="@+id/LinearEditName">
+                    >
+
+                    <TextView
+                        android:id="@+id/labelName"
+                        android:layout_width="101dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="20dp"
+                        android:text="Tên: "
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/txtName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical"
+                        android:text="Nguyễn Hiếu Đan"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/iconName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical|right"
+                        android:paddingRight="20dp"
+                        android:text=">"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@drawable/my_custom_background"
+                    android:orientation="horizontal"
+                    android:id="@+id/LinearEditNickName">>
+
+                    <TextView
+                        android:id="@+id/labelNickName"
+                        android:layout_width="73dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="20dp"
+                        android:text="Tên hiển thị:"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/txtNickName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical"
+                        android:text="Đan Vippro"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/iconNickName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical|right"
+                        android:paddingRight="20dp"
+                        android:text=">"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@drawable/my_custom_background"
+                    android:orientation="horizontal"
+                    android:id="@+id/LinearEditpassword">>
+
+                    <TextView
+                        android:id="@+id/labelPassword"
+                        android:layout_width="58dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="20dp"
+                        android:text="Mật khẩu"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/txtPassword"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical"
+                        android:text="********"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/iconPassword"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical|right"
+                        android:paddingRight="20dp"
+                        android:text=">"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@drawable/my_custom_background"
+                    android:orientation="horizontal"
+                    android:id="@+id/LinearSave">
+
+                    <TextView
+                        android:id="@+id/txtSave"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="20dp"
+                        android:text="Lưu thay đổi"
+                        android:background="@color/zalo_app_bar_color"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
