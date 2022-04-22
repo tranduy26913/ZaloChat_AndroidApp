@@ -21,6 +21,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.Nullable;
 import com.hbb20.CountryCodePicker;
 
+import java.util.regex.Pattern;
+
 public class RegisterActivity extends AppCompatActivity {
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     Button btnRegister;
@@ -39,18 +41,21 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                RegisterAccount();
+                String phone = ccp.getDefaultCountryCodeWithPlus()+  txtPhone.getText().toString().trim();
+                String password = txtPassword.getText().toString();
+                String fullname = txtName.getText().toString();
+                User user = new User(phone,password,fullname);
+                if(validate(user)){
+                    user.setPassword(UtilPassword.HashPassword(password));
+                    RegisterAccount(user);
+                }
             }
         });
     }
 
-    private void RegisterAccount(){
-        String phone = ccp.getDefaultCountryCodeWithPlus()+  txtPhone.getText().toString().trim();
-        String password = UtilPassword.HashPassword(txtPassword.getText().toString());
-        String fullname = txtName.getText().toString();
-        User user = new User(phone,password,fullname);
+    private void RegisterAccount(User user){
 
-        final DatabaseReference users = database.getReference("USERS").child(phone);//lấy data
+        final DatabaseReference users = database.getReference("USERS").child(user.getPhone());//lấy data
 
         users.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -97,5 +102,36 @@ public class RegisterActivity extends AppCompatActivity {
     public void onClickGoToLogin(View view) {
         Intent intent = new Intent(this,LoginActivity.class);
         startActivity(intent);
+    }
+
+    private boolean validate(User user){
+        String VIETNAMESE_DIACRITIC_CHARACTERS
+                = "ẮẰẲẴẶĂẤẦẨẪẬÂÁÀÃẢẠĐẾỀỂỄỆÊÉÈẺẼẸÍÌỈĨỊỐỒỔỖỘÔỚỜỞỠỢƠÓÒÕỎỌỨỪỬỮỰƯÚÙỦŨỤÝỲỶỸỴ";
+
+        Pattern numphone = Pattern.compile("\\+\\d+$");
+
+        boolean rs = true;
+        if(user.getPhone().startsWith("+840")){
+            Toast.makeText(this,"Số điện thoại không được bắt đầu với 0",Toast.LENGTH_SHORT).show();
+            rs = false;
+        }
+        else if(!user.getPhone().matches(numphone.pattern())){
+            Toast.makeText(this,"Số điện không được tồn tại kí tự ngoài số",Toast.LENGTH_SHORT).show();
+            rs = false;
+        }
+        else if(user.getPhone() == null ||user.getPhone().length() != 12){
+            Toast.makeText(this,"số điện thoại bao gồm 9 chữ số",Toast.LENGTH_SHORT).show();
+            rs = false;
+        }
+        else if(user.getFullname() == null || user.getFullname().length() == 0 || user.getFullname().length() > 50){
+            Toast.makeText(this,"Tên không hợp lệ",Toast.LENGTH_SHORT).show();
+            rs = false;
+        }
+        else if(user.getPassword() == null || user.getPassword().length() == 0|| user.getPassword().length() > 50){
+            Toast.makeText(this,"Mật khẩu không hợp lệ",Toast.LENGTH_SHORT).show();
+            rs = false;
+        }
+        return rs;
+
     }
 }

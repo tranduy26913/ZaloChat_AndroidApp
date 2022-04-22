@@ -10,9 +10,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ZaloChat">
         <activity
+            android:name=".EditNameActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserInfoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AccountActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.ChatActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="true" />
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".view.LoginActivity"
             android:exported="true">
@@ -30,7 +39,7 @@
             android:exported="false" />
         <activity
             android:name=".view.RegisterActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true" />
