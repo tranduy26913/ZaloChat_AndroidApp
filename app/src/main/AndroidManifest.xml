@@ -10,15 +10,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ZaloChat">
         <activity
-            android:name=".EditNameActivity"
-            android:exported="false" />
-        <activity
-            android:name=".UserInfoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AccountActivity"
-            android:exported="false" />
-        <activity
             android:name=".view.ChatActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize" />
