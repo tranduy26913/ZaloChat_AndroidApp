@@ -1,6 +1,8 @@
 package com.android.zalochat.model;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     protected String userId;
     protected String phone;
     protected String password;

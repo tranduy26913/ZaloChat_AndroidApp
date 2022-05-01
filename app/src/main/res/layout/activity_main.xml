@@ -49,6 +49,7 @@
         app:layout_constraintRight_toRightOf="parent">
 
         <SearchView
+            android:id="@+id/searchViewMain"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal"

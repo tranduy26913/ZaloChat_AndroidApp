@@ -43,6 +43,7 @@ import com.android.zalochat.model.Chat;
 import com.android.zalochat.model.Message;
 import com.android.zalochat.model.User;
 import com.android.zalochat.model.payload.MessageChat;
+import com.android.zalochat.model.payload.UserChat;
 import com.android.zalochat.util.Constants;
 import com.android.zalochat.util.Util;
 import com.google.android.gms.common.util.JsonUtils;
@@ -80,7 +81,8 @@ public class ChatActivity extends AppCompatActivity {
     ConstraintLayout layoutImgSendMessage;
     ImageView imgSendMessage;
     String chatId;
-    User userOwn, friendUser;
+    User userOwn;
+    UserChat friendUser;
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     RecyclerView recyclerViewMessageChat;
     Bitmap myAvatar, friendAvatar;
@@ -119,8 +121,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void loadDataIntent() {
-        String userJson = getIntent().getStringExtra(Constants.USER_JSON);
-        friendUser = gson.fromJson(userJson,User.class);
+
+        friendUser = (UserChat) getIntent().getSerializableExtra(Constants.USER_JSON);
         txtUserName.setText(friendUser.getFullname());
         Picasso.get().load(friendUser.getAvatar()).into(new Target() {
             @Override
@@ -163,7 +165,6 @@ public class ChatActivity extends AppCompatActivity {
 
         } else
             chatId = getIntent().getStringExtra("chatId");
-
     }
 
 

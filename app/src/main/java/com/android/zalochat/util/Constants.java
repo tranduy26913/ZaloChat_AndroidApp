@@ -9,6 +9,4 @@ public class Constants {
     public static final String IMAGE ="IMAGE";
     public static final String SOUND = "SOUND";
     public static final String FILE = "FILE";
-
-
 }

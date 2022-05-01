@@ -1,6 +1,8 @@
 package com.android.zalochat.model.payload;
 
-public class UserChat {
+import java.io.Serializable;
+
+public class UserChat implements Serializable {
     private String avatar;
     private String fullname;
     private String message;

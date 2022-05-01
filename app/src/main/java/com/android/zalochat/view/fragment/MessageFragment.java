@@ -117,9 +117,7 @@ public class MessageFragment extends Fragment {
 
     private void GoToChatActivity(UserChat userChat) {
         Intent intent = new Intent(this.getContext(), ChatActivity.class);
-        Gson gson = new Gson();
-        String userChatJson = gson.toJson(userChat);
-        intent.putExtra(Constants.USER_JSON,userChatJson);
+        intent.putExtra(Constants.USER_JSON,userChat);
         startActivity(intent);
     }
 }
