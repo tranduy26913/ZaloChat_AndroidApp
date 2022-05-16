@@ -32,6 +32,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 
 import java.text.ParsePosition;
@@ -44,6 +50,9 @@ public class MessageFragment extends Fragment {
 
     private RecyclerView recyclerViewUserChat;
     private User userOwn;//Tài khoản của mình
+    private FirebaseFirestore database;
+    private UserChatAdapter userChatAdapter;
+    private List<UserChat> userChatList = new ArrayList<>();
     public MessageFragment() {
         // Required empty public constructor
     }
@@ -57,6 +66,7 @@ public class MessageFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        database = FirebaseFirestore.getInstance();
         recyclerViewUserChat = view.findViewById(R.id.recyclerViewUserChat);
         SharedPreferences ref = view.getContext().getSharedPreferences(Constants.SHAREPREF_USER, MODE_PRIVATE);
         String jsonUser = ref.getString(Constants.USER_JSON, "");
@@ -77,42 +87,29 @@ public class MessageFragment extends Fragment {
     }
 
     private void LoadUserChat(){
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         // truy vấn vào nhánh username mà người dùng nhập
-        DatabaseReference users = firebaseDatabase.getReference("USERS");
-
-        users.addValueEventListener(new ValueEventListener() {
+        CollectionReference userRef = database.collection(Constants.USER_COLLECTION);
+        userRef.whereNotEqualTo("userId",userOwn.getUserId())
+        .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<HashMap<String, User>> objectsGTypeInd =
-                        new GenericTypeIndicator<HashMap<String, User>>() {
-                        };
-                Map<String, User> objectHashMap = dataSnapshot.getValue(objectsGTypeInd);
-                final List<User> objectArrayList = new ArrayList<>(objectHashMap.values());
-                final List<UserChat> userChatList = new ArrayList<>();
-                for (User user: objectArrayList ) {
-                    if(!user.getUserId().equals(userOwn.getUserId()))
-                        userChatList.add(UserMapping.EntityToUserchat(user,"Hãy bắt đầu gửi tin nhắn đầu tiên"));
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                for(QueryDocumentSnapshot doc:value){
+                    userChatList.add(UserMapping.EntityToUserchat(doc.toObject(User.class),"Hãy bắt đầu gửi tin nhắn đầu tiên"));
                 }
-                UserChatAdapter userChatAdapter = new UserChatAdapter(userChatList, new IClickItemUserChatListener() {
-                    @Override
-                    public void onClickItemUserChat(UserChat userChat) {
-                        GoToChatActivity(userChat);
-                    }
-                });
-                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-                recyclerViewUserChat.setAdapter(userChatAdapter);
-                recyclerViewUserChat.setLayoutManager(linearLayoutManager);
-                recyclerViewUserChat.setHasFixedSize(true);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                userChatAdapter.notifyDataSetChanged();
             }
         });
 
+        userChatAdapter = new UserChatAdapter(userChatList, new IClickItemUserChatListener() {
+            @Override
+            public void onClickItemUserChat(UserChat userChat) {
+                GoToChatActivity(userChat);
+            }
+        });
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerViewUserChat.setAdapter(userChatAdapter);
+        recyclerViewUserChat.setLayoutManager(linearLayoutManager);
+        recyclerViewUserChat.setHasFixedSize(true);
     }
 
     private void GoToChatActivity(UserChat userChat) {

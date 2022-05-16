@@ -2,6 +2,7 @@ package com.android.zalochat.view;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.Constraints;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +13,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.zalochat.R;
+import com.android.zalochat.util.Constants;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class EnterCodeOtpActivity extends AppCompatActivity {
 
@@ -35,6 +39,7 @@ public class EnterCodeOtpActivity extends AppCompatActivity {
     EditText txtVerifyCode;
 
     FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +62,7 @@ signInWithPhoneAuthCredential(credential);
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+
         //DatabaseReference users = firebaseDatabase.getReference("USERS").child(phonenumber);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -80,22 +86,12 @@ signInWithPhoneAuthCredential(credential);
     }
 
     private void ActiveUser(String phonenumber) {
-
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference users = firebaseDatabase.getReference("USERS").child(phonenumber);
-        users.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.getValue()!=null){
-                    firebaseDatabase.getReference("USERS").child(phonenumber).child("active").setValue(true);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        database.collection(Constants.USER_COLLECTION)
+                .document(phonenumber)
+                .update("active",true);
 
     }
 

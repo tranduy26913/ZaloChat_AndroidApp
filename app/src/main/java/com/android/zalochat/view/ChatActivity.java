@@ -56,6 +56,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -68,7 +74,9 @@ import org.json.JSONStringer;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -93,6 +101,7 @@ public class ChatActivity extends AppCompatActivity {
     private UploadTask uploadTask;
     int SELECT_PICTURE = 200;
     final Gson gson =new Gson();
+    private FirebaseFirestore db =FirebaseFirestore.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,28 +149,46 @@ public class ChatActivity extends AppCompatActivity {
         });
         if (getIntent().getStringExtra("chatId") == null) {
             chatId = "";
-            DatabaseReference chats = database.getReference("CHATS");//lấy data
-            chats.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Chat chat = snapshot.getValue(Chat.class);
-                        if (chat.getSender().equals(userOwn.getUserId()) && chat.getReceiver().equals(friendUser.getUserId())) {
-                            chatId = chat.getId();
+            db.collection(Constants.CHAT_COLLECTION)
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            Chat chat;
+                            for (QueryDocumentSnapshot doc:value){
+                                chat = doc.toObject(Chat.class);
+                                if (chat.getSender().equals(userOwn.getUserId()) && chat.getReceiver().equals(friendUser.getUserId())) {
+                                    chatId = chat.getId();
 
-                        } else if (chat.getSender().equals(friendUser.getUserId()) && chat.getReceiver().equals(userOwn.getUserId())) {
-                            chatId = chat.getId();
+                                } else if (chat.getSender().equals(friendUser.getUserId()) && chat.getReceiver().equals(userOwn.getUserId())) {
+                                    chatId = chat.getId();
+                                }
+                                if(!chatId.equals(""))
+                                    LoadMessage();//tạm thời để ở đây
+                            }
                         }
-                    }
-                    if(!chatId.equals(""))
-                        LoadMessage();//tạm thời để ở đây
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
+                    });
+            DatabaseReference chats = database.getReference("CHATS");//lấy data
+//            chats.addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                        Chat chat = snapshot.getValue(Chat.class);
+//                        if (chat.getSender().equals(userOwn.getUserId()) && chat.getReceiver().equals(friendUser.getUserId())) {
+//                            chatId = chat.getId();
+//
+//                        } else if (chat.getSender().equals(friendUser.getUserId()) && chat.getReceiver().equals(userOwn.getUserId())) {
+//                            chatId = chat.getId();
+//                        }
+//                    }
+//                    if(!chatId.equals(""))
+//                        LoadMessage();//tạm thời để ở đây
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError error) {
+//
+//                }
+//            });
 
         } else
             chatId = getIntent().getStringExtra("chatId");
@@ -248,7 +275,9 @@ public class ChatActivity extends AppCompatActivity {
         if (chatId.equals("")) {
             chatId = userOwn.getUserId().concat(friendUser.getUserId());
             chat = new Chat(chatId, userOwn.getUserId(), friendUser.getUserId(), (new Date()).getTime(), "Tin nhắn đầu tiên");
-            database.getReference("CHATS").child(chatId).setValue(chat);
+            db.collection(Constants.CHAT_COLLECTION)
+                    .document(chatId)
+                    .set(chat);
             LoadMessage();
         }
         UUID uuid =  UUID.randomUUID();
@@ -274,8 +303,12 @@ public class ChatActivity extends AppCompatActivity {
                         String path =  task.getResult().toString();
                         Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), path,
                                 new Date().getTime(),"LIKE",Constants.IMAGE);
-                        DatabaseReference ref = database.getReference("MESSAGES");
-                        ref.child(chatId).child(String.valueOf(message.getTime())).setValue(message);
+                        db.collection(Constants.MESSAGE_COLLECTION)
+                                .document(chatId)
+                                .collection(Constants.SUBMESSAGE_COLLECTION)
+                                .document(message.getId()).set(message);
+                        //DatabaseReference ref = database.getReference("MESSAGES");
+                        //ref.child(chatId).child(String.valueOf(message.getTime())).setValue(message);
 
                     }
                 }
@@ -288,8 +321,10 @@ public class ChatActivity extends AppCompatActivity {
         else {
             Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), txtBodyMessage.getText().toString(),
                     new Date().getTime(),"LIKE",Constants.TEXT);
-            DatabaseReference ref = database.getReference("MESSAGES");
-            ref.child(chatId).child(String.valueOf(message.getTime())).setValue(message);
+            db.collection(Constants.MESSAGE_COLLECTION)
+                    .document(chatId)
+                    .collection(Constants.SUBMESSAGE_COLLECTION)
+                    .document(message.getId()).set(message);
             txtBodyMessage.setText("");
         }
 
@@ -297,7 +332,36 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void LoadMessage(){
-        DatabaseReference reference = database.getReference("MESSAGES").child(chatId);
+        db.collection(Constants.MESSAGE_COLLECTION)
+                .document(chatId)
+                .collection(Constants.SUBMESSAGE_COLLECTION)
+                .orderBy("time")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        messageList.clear();
+                        for (QueryDocumentSnapshot doc:value){
+                            Message message = doc.toObject(Message.class);
+                            MessageChat messageChat;
+                            if(message.getSender().equals(userOwn.getUserId()))//nếu là người gửi là mình
+                            {
+                                messageChat= MessageMapping.EntityToMessageChat(message,myAvatar);
+                            }
+                            else {
+                                messageChat = MessageMapping.EntityToMessageChat(message,friendAvatar);
+                            }
+                            messageList.add(messageChat);
+                        }
+                        recyclerViewMessageChat.setHasFixedSize(true);
+                        recyclerViewMessageChat.setAdapter(messageAdapter);
+                        recyclerViewMessageChat.setItemViewCacheSize(50);
+                        recyclerViewMessageChat.setDrawingCacheEnabled(true);
+                        recyclerViewMessageChat.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+                        messageAdapter.notifyDataSetChanged();
+                        recyclerViewMessageChat.smoothScrollToPosition(messageList.size());
+                    }
+                });
+  /*      DatabaseReference reference = database.getReference("MESSAGES").child(chatId);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -321,6 +385,7 @@ public class ChatActivity extends AppCompatActivity {
                 recyclerViewMessageChat.setItemViewCacheSize(50);
                 recyclerViewMessageChat.setDrawingCacheEnabled(true);
                 recyclerViewMessageChat.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
             }
 
             @Override
@@ -366,7 +431,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        });*/
     }
 
     void imageChooser() {
