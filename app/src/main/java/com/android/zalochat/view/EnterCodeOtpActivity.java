@@ -61,9 +61,6 @@ signInWithPhoneAuthCredential(credential);
     }
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
 
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-
-        //DatabaseReference users = firebaseDatabase.getReference("USERS").child(phonenumber);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -92,7 +89,6 @@ signInWithPhoneAuthCredential(credential);
         database.collection(Constants.USER_COLLECTION)
                 .document(phonenumber)
                 .update("active",true);
-
     }
 
     private void GoToLogin(String phonenumber){

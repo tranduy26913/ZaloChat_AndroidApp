@@ -167,29 +167,6 @@ public class ChatActivity extends AppCompatActivity {
                             }
                         }
                     });
-            DatabaseReference chats = database.getReference("CHATS");//lấy data
-//            chats.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                        Chat chat = snapshot.getValue(Chat.class);
-//                        if (chat.getSender().equals(userOwn.getUserId()) && chat.getReceiver().equals(friendUser.getUserId())) {
-//                            chatId = chat.getId();
-//
-//                        } else if (chat.getSender().equals(friendUser.getUserId()) && chat.getReceiver().equals(userOwn.getUserId())) {
-//                            chatId = chat.getId();
-//                        }
-//                    }
-//                    if(!chatId.equals(""))
-//                        LoadMessage();//tạm thời để ở đây
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError error) {
-//
-//                }
-//            });
-
         } else
             chatId = getIntent().getStringExtra("chatId");
     }
@@ -285,8 +262,6 @@ public class ChatActivity extends AppCompatActivity {
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference().child("IMAGES");
             StorageReference filePath = storageRef.child(uuid.toString());
-
-
             uploadTask = filePath.putFile(fileImageSend);
             uploadTask.continueWithTask(new Continuation() {
                 @Override
@@ -307,9 +282,6 @@ public class ChatActivity extends AppCompatActivity {
                                 .document(chatId)
                                 .collection(Constants.SUBMESSAGE_COLLECTION)
                                 .document(message.getId()).set(message);
-                        //DatabaseReference ref = database.getReference("MESSAGES");
-                        //ref.child(chatId).child(String.valueOf(message.getTime())).setValue(message);
-
                     }
                 }
             });
@@ -361,88 +333,14 @@ public class ChatActivity extends AppCompatActivity {
                         recyclerViewMessageChat.smoothScrollToPosition(messageList.size());
                     }
                 });
-  /*      DatabaseReference reference = database.getReference("MESSAGES").child(chatId);
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                messageList.clear();
-                Log.d("LoadMessage","Data change");
-                for (DataSnapshot snapshot:dataSnapshot.getChildren() ) {
-                    Message message = snapshot.getValue(Message.class);
-                    MessageChat messageChat;
-                    if(message.getSender().equals(userOwn.getUserId()))//nếu là người gửi là mình
-                    {
-                         messageChat= MessageMapping.EntityToMessageChat(message,myAvatar);
-                    }
-                    else {
-                        messageChat = MessageMapping.EntityToMessageChat(message,friendAvatar);
-                    }
-                    messageList.add(messageChat);
-
-                }
-                recyclerViewMessageChat.setHasFixedSize(true);
-                recyclerViewMessageChat.setAdapter(messageAdapter);
-                recyclerViewMessageChat.setItemViewCacheSize(50);
-                recyclerViewMessageChat.setDrawingCacheEnabled(true);
-                recyclerViewMessageChat.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        reference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Log.d("LoadMessage","Data add");
-                Message message =snapshot.getValue(Message.class);
-                MessageChat messageChat;
-                if(message.getSender().equals(userOwn.getUserId()))//nếu là người gửi là mình
-                {
-                    messageChat= MessageMapping.EntityToMessageChat(message,myAvatar);
-                }
-                else {
-                    messageChat = MessageMapping.EntityToMessageChat(message,friendAvatar);
-                }
-                messageList.add(messageChat);
-                messageAdapter.notifyDataSetChanged();
-                recyclerViewMessageChat.smoothScrollToPosition(messageList.size());
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });*/
     }
 
     void imageChooser() {
-
         Intent i = new Intent();
         i.setType("image/*");
         i.setAction(Intent.ACTION_GET_CONTENT);
         mStartForResult.launch(Intent.createChooser(i, "Select Picture"));
     }
-
-
 
     ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
