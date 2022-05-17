@@ -5,12 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".view.fragment.PhoneBookFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/RecycleViewListUserPhoneBook"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Danh bạ"
-        android:textColor="@color/txt_color"
-        android:textSize="20sp" />
-
+        android:layout_height="match_parent" />
 </FrameLayout>

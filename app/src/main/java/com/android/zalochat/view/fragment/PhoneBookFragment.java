@@ -1,60 +1,67 @@
 package com.android.zalochat.view.fragment;
 
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.android.zalochat.R;
+import com.android.zalochat.adapter.ContactAdapter;
+import com.android.zalochat.adapter.UserChatAdapter;
+import com.android.zalochat.event.IClickItemUserChatListener;
+import com.android.zalochat.model.Contact;
+import com.android.zalochat.model.User;
+import com.android.zalochat.model.payload.UserChat;
+import com.android.zalochat.util.Constants;
+import com.android.zalochat.util.ObjectSerializer;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PhoneBookFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class PhoneBookFragment extends Fragment {
+    private RecyclerView recyclerViewPhoneBook;
+    private List<Contact> contactList;
+    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("dataZaloApp", getActivity().MODE_PRIVATE);
+    SharedPreferences.Editor editor = sharedPreferences.edit();
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private FirebaseFirestore database;
+    CollectionReference userRef = database.collection(Constants.USER_COLLECTION);
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int flag = 0;
+
 
     public PhoneBookFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PhoneBookFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PhoneBookFragment newInstance(String param1, String param2) {
-        PhoneBookFragment fragment = new PhoneBookFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -62,5 +69,85 @@ public class PhoneBookFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_phone_book, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        recyclerViewPhoneBook = view.findViewById(R.id.RecycleViewListUserPhoneBook);
+
+        try {
+            contactList = (ArrayList<Contact>) ObjectSerializer.deserialize(sharedPreferences.getString("contactData", ObjectSerializer.serialize(new ArrayList<Contact>())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        LoadDataFromContact();
+
+        LoadDataToAdapter();
+    }
+
+    private void LoadDataFromContact() {
+        if(contactList.size()==0){
+            contactList = new ArrayList<>();
+            Uri uriContact = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+            Cursor cursor;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                cursor = getActivity().getContentResolver().query(uriContact, null, null, null);
+            }
+            else{
+                return;
+            }
+
+            while(cursor.moveToNext()){
+                String idName = ContactsContract.Contacts.DISPLAY_NAME;
+                String idPhone = ContactsContract.CommonDataKinds.Phone.NUMBER;
+                int colNameIndex = cursor.getColumnIndex(idName);
+                int colPhoneIndex=cursor.getColumnIndex(idPhone);
+                String name = cursor.getString(colNameIndex);
+                String phone = cursor.getString(colPhoneIndex);
+                Contact newContact = new Contact();
+                newContact.setPhone(phone);
+                newContact.setFullname(name);
+                userRef.whereEqualTo("phone",newContact.getPhone()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            for(QueryDocumentSnapshot doc: task.getResult()){
+                                User oldUser = doc.toObject(User.class);
+                                newContact.setAvatar(oldUser.getAvatar());
+                                newContact.setFullname(oldUser.getFullname());
+                                flag = 1;
+                                break;
+                            }
+                        }
+                    }
+                });
+
+                if(flag == 1){
+                    flag = 0 ;
+                    contactList.add(newContact);
+                }
+                else{
+                    contactList.add(newContact);
+                }
+            }
+
+            try {
+                editor.putString("contactData", ObjectSerializer.serialize((Serializable) contactList));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void LoadDataToAdapter() {
+        ContactAdapter contactAdapter = new ContactAdapter(getActivity(),contactList);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerViewPhoneBook.setAdapter(contactAdapter);
+        recyclerViewPhoneBook.setLayoutManager(linearLayoutManager);
+        recyclerViewPhoneBook.setHasFixedSize(true);
     }
 }
