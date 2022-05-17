@@ -12,19 +12,17 @@ import android.widget.Toast;
 
 import com.android.zalochat.R;
 import com.android.zalochat.model.User;
+import com.android.zalochat.util.Constants;
 import com.android.zalochat.util.UtilPassword;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.database.annotations.Nullable;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.hbb20.CountryCodePicker;
 
 import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
-    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    final FirebaseFirestore database = FirebaseFirestore.getInstance();
     Button btnRegister;
     EditText txtPhone,txtPassword,txtName;
     CountryCodePicker ccp;
@@ -55,42 +53,25 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void RegisterAccount(User user){
 
-        final DatabaseReference users = database.getReference("USERS").child(user.getPhone());//lấy data
+        database.collection(Constants.USER_COLLECTION)
+                .document(user.getUserId())
+                .set(user)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(RegisterActivity.this,
+                                    "Tạo tài khoản thành công", Toast.LENGTH_SHORT).show();
 
-        users.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                if (dataSnapshot.getValue() == null) {
-                    // them user vao nhanh Users
-                    users.setValue(user, new DatabaseReference.CompletionListener() {
-                        @Override
-                        public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                            if (databaseError == null) {
-                                Toast.makeText(RegisterActivity.this,
-                                        "Tạo tài khoản thành công", Toast.LENGTH_SHORT).show();
-
-                                GoToVerifyPhoneNumber();
-                                finish();
-                            } else {
-                                Toast.makeText(RegisterActivity.this,
-                                        "Tạo tài khoản không thành công", Toast.LENGTH_SHORT).show();
-                            }
+                            GoToVerifyPhoneNumber();
+                            finish();
+                        }else {
+                            Toast.makeText(RegisterActivity.this,
+                                    "Tạo tài khoản không thành công", Toast.LENGTH_SHORT).show();
                         }
-                    });
+                    }
+                });
 
-                    // username da ton tai, thong bao chon username khac
-                } else {
-                    Toast.makeText(RegisterActivity.this,
-                            "Tài khoản đã tồn tại", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
 
     private void GoToVerifyPhoneNumber() {

@@ -7,7 +7,7 @@ public class User implements Serializable {
     protected String phone;
     protected String password;
     protected String fullname = "";
-    protected String avatar = "";
+    protected String avatar = "https://firebasestorage.googleapis.com/v0/b/zalo-3bea3.appspot.com/o/IMAGES%2Favatar.jpg?alt=media&token=7260c6b2-c99d-4e1f-a21e-e26571cb5b15";
     protected boolean active = false;
     protected boolean online = true;
 

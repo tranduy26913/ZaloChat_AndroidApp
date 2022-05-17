@@ -1,6 +1,9 @@
 package com.android.zalochat.view.fragment;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,7 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.android.zalochat.MainActivity;
 import com.android.zalochat.R;
+import com.android.zalochat.util.Constants;
+import com.android.zalochat.view.LoginActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,6 +26,7 @@ import com.android.zalochat.R;
 public class AccountFragment extends Fragment {
 
     private LinearLayout linearLayoutProfile;
+    private LinearLayout linearLogout;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -72,6 +79,7 @@ public class AccountFragment extends Fragment {
     }
     protected void setView(View view){
         linearLayoutProfile = view.findViewById(R.id.LinearUserInfo);
+        linearLogout = view.findViewById(R.id.LinearLogout);
     }
     protected void setOnclick(){
         linearLayoutProfile.setOnClickListener(new View.OnClickListener() {
@@ -84,6 +92,23 @@ public class AccountFragment extends Fragment {
                         .commit();
             }
         });
+        linearLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences.Editor prefedit
+                        = getContext().getSharedPreferences(Constants.SHAREPREF_USER, MODE_PRIVATE).edit();
+                prefedit.remove(Constants.USERID);
+                prefedit.remove(Constants.USER_JSON);
+                prefedit.apply();
+                GoToLogin();
+            }
+        });
+    }
+
+    private void GoToLogin() {
+        Intent intent = new Intent(getContext(), LoginActivity.class);
+        getContext().startActivity(intent);
+        getActivity().finish();
     }
 
 }
