@@ -282,6 +282,9 @@ public class ChatActivity extends AppCompatActivity {
                                 .document(chatId)
                                 .collection(Constants.SUBMESSAGE_COLLECTION)
                                 .document(message.getId()).set(message);
+                        db.collection(Constants.CHAT_COLLECTION)
+                                .document(chatId)
+                                .update("lastmessage","[Hình ảnh]");
                     }
                 }
             });
@@ -297,6 +300,9 @@ public class ChatActivity extends AppCompatActivity {
                     .document(chatId)
                     .collection(Constants.SUBMESSAGE_COLLECTION)
                     .document(message.getId()).set(message);
+            db.collection(Constants.CHAT_COLLECTION)
+                    .document(chatId)
+                    .update("lastmessage",message.getContent());
             txtBodyMessage.setText("");
         }
 

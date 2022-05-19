@@ -37,7 +37,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatHolder> {
         UserChat chat = userChatList.get(position);
         Picasso.get().load(chat.getAvatar()).into(holder.imgAvatar);
         holder.tvDisplayNameUserChat.setText(chat.getFullname());
-        holder.tvDescriptionMessage.setText("Gửi tin nhắn đầu tiên");
+        holder.tvDescriptionMessage.setText(chat.getMessage());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

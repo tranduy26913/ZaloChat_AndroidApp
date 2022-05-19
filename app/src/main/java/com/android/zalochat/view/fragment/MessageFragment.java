@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +24,13 @@ import com.android.zalochat.R;
 import com.android.zalochat.adapter.UserChatAdapter;
 import com.android.zalochat.event.IClickItemUserChatListener;
 import com.android.zalochat.mapping.UserMapping;
+import com.android.zalochat.model.Chat;
 import com.android.zalochat.model.User;
 import com.android.zalochat.model.payload.UserChat;
 import com.android.zalochat.util.Constants;
 import com.android.zalochat.view.ChatActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,6 +38,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -87,15 +93,37 @@ public class MessageFragment extends Fragment {
 
     private void LoadUserChat(){
         // truy vấn vào nhánh username mà người dùng nhập
-        CollectionReference userRef = database.collection(Constants.USER_COLLECTION);
-        userRef.whereNotEqualTo("userId",userOwn.getUserId())
+        CollectionReference chatRef = database.collection(Constants.CHAT_COLLECTION);
+        chatRef.whereGreaterThanOrEqualTo("id",userOwn.getUserId())
         .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                userChatList.clear();
                 for(QueryDocumentSnapshot doc:value){
-                    userChatList.add(UserMapping.EntityToUserchat(doc.toObject(User.class),"Hãy bắt đầu gửi tin nhắn đầu tiên"));
+                    Chat chat = doc.toObject(Chat.class);
+                    String idFriend ="";
+                    if(chat.getReceiver().equals(userOwn.getUserId())){
+                        idFriend = chat.getSender();
+                    }
+                    else {
+                        idFriend = chat.getReceiver();
+                    }
+
+                    Task<DocumentSnapshot> user = database.collection(Constants.USER_COLLECTION)
+                            .document(idFriend)
+                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        if(task.getResult().exists()){
+                                            userChatList.add(UserMapping.EntityToUserchat(task.getResult().toObject(User.class),chat.getLastmessage()));
+                                            userChatAdapter.notifyDataSetChanged();
+                                        }
+                                    }
+                                }
+                            });
                 }
-                userChatAdapter.notifyDataSetChanged();
+
             }
         });
 
