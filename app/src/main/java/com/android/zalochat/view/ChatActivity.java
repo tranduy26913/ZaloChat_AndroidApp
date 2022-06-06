@@ -49,6 +49,8 @@ import com.android.zalochat.util.Util;
 import com.google.android.gms.common.util.JsonUtils;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -384,4 +386,5 @@ public class ChatActivity extends AppCompatActivity {
         imgSendMessage.setImageBitmap(null);
         layoutImgSendMessage.setVisibility(GONE);
     }
+
 }

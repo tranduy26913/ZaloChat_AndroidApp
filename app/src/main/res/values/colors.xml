@@ -10,6 +10,7 @@
     <color name="login_button">#FF1C5E88</color>
     <color name="txt_color">#333333</color>
     <color name="txt_color_secondary">#666</color>
+    <color name="txt_color_secondary2">#AAA8A8</color>
     <color name="stoke_border_message">#bababa</color>
     <color name="main_color_bg">#0091ff</color>
     <color name="main_color_bg_white">#F4F4F4</color>
@@ -17,4 +18,11 @@
     <color name="your_message_background">#E5EFFF</color>
     <color name="zalo_app_bar_color">#0091FF</color>
     <color name="online_status_background">#E4E6EA</color>
+    <color name="txt_color_white">#bababa</color>
+    <color name="bg_divider">#E0DEDE</color>
+    <color name="bg_icon_item_ac_1">#2196F3</color>
+    <color name="bg_icon_item_ac_2">#F64913</color>
+    <color name="bg_icon_item_ac_3">#438F59</color>
+    <color name="bg_icon_item_ac_4">#504F4F</color>
+
 </resources>

@@ -72,7 +72,6 @@ public class LoginActivity extends AppCompatActivity {
                                 String jsonUser = gson.toJson(user);
                                 prefedit.putString(Constants.USERID, user.getUserId());
                                 prefedit.putString(Constants.USER_JSON, jsonUser);
-
                                 prefedit.apply();
                                 progress.dismiss();
                                 GoToMainActivity();
