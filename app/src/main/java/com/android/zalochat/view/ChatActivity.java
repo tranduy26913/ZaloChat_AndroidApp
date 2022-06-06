@@ -95,7 +95,7 @@ public class ChatActivity extends AppCompatActivity {
     RecyclerView recyclerViewMessageChat;
     Bitmap myAvatar, friendAvatar;
     List<MessageChat> messageList = new ArrayList<MessageChat>();
-    MessageAdapter messageAdapter = new MessageAdapter(messageList,ChatActivity.this);
+    MessageAdapter messageAdapter;
     private SharedPreferences pref;
     private Uri fileImageSend;
     private UploadTask uploadTask;
@@ -147,7 +147,7 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-        if (getIntent().getStringExtra("chatId") == null) {
+        if (friendUser.getChatId().equals("")) {
             chatId = "";
             db.collection(Constants.CHAT_COLLECTION)
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -162,13 +162,13 @@ public class ChatActivity extends AppCompatActivity {
                                 } else if (chat.getSender().equals(friendUser.getUserId()) && chat.getReceiver().equals(userOwn.getUserId())) {
                                     chatId = chat.getId();
                                 }
-                                if(!chatId.equals(""))
-                                    LoadMessage();//tạm thời để ở đây
                             }
                         }
                     });
         } else
-            chatId = getIntent().getStringExtra("chatId");
+            chatId = friendUser.getChatId();
+        if(!chatId.equals(""))
+            LoadMessage();//tạm thời để ở đây
     }
 
 
@@ -277,7 +277,7 @@ public class ChatActivity extends AppCompatActivity {
                     if(task.isSuccessful()){
                         String path =  task.getResult().toString();
                         Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), path,
-                                new Date().getTime(),"LIKE",Constants.IMAGE);
+                                new Date().getTime(),-1,Constants.IMAGE);
                         db.collection(Constants.MESSAGE_COLLECTION)
                                 .document(chatId)
                                 .collection(Constants.SUBMESSAGE_COLLECTION)
@@ -295,7 +295,7 @@ public class ChatActivity extends AppCompatActivity {
         }
         else {
             Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), txtBodyMessage.getText().toString(),
-                    new Date().getTime(),"LIKE",Constants.TEXT);
+                    new Date().getTime(),-1,Constants.TEXT);
             db.collection(Constants.MESSAGE_COLLECTION)
                     .document(chatId)
                     .collection(Constants.SUBMESSAGE_COLLECTION)
@@ -310,6 +310,9 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void LoadMessage(){
+        if(chatId==null || chatId.equals(""))
+            return;
+        messageAdapter = new MessageAdapter(messageList,ChatActivity.this,chatId);
         db.collection(Constants.MESSAGE_COLLECTION)
                 .document(chatId)
                 .collection(Constants.SUBMESSAGE_COLLECTION)

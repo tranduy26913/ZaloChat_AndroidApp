@@ -13,6 +13,20 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent">
 
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imgReactionMessage"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="@id/layoutMessage"
+        app:layout_constraintTop_toBottomOf="@id/layoutMessage"
+
+        android:layout_marginTop="-5dp"
+        app:shapeAppearanceOverlay="@style/circle"
+        android:background="@color/white"
+        android:src="@drawable/ic_like_border"
+
+        />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imgAvatarMessage"
@@ -26,8 +40,9 @@
         />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/layoutMessage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
