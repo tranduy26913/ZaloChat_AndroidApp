@@ -29,6 +29,7 @@ public class AccountSettingActivity extends AppCompatActivity {
     private ConstraintLayout changePassword;
     private ImageView imageView;//Liên kết đến phần tử layoutcontraint Đổi mật khẩu
     private TextView textName;//Liên kết đến tên người dùng
+    private TextView tvPhoneDescription;//Liên kết đến hiển thị số điện thoại người dùng
     private ConstraintLayout changeName;//Liên kết đến phần tử layoutcontraint Đổi tên người dùng
     private ConstraintLayout logout;//Liên kết đến phần tử layoutcontraint Đăng xuất
     private User userOwn;
@@ -48,6 +49,7 @@ public class AccountSettingActivity extends AppCompatActivity {
         }
         Picasso.get().load(userOwn.getAvatar()).into(this.imageView);// Tải ra hình ảnh người đang dùng
         this.textName.setText(userOwn.getFullname());//tải ra tên người dùng đang dùng
+        this.tvPhoneDescription.setText(userOwn.getPhone());//Hiển thị sđt người dùng
     }
 
     private void setView() {
@@ -56,6 +58,7 @@ public class AccountSettingActivity extends AppCompatActivity {
         this.logout = findViewById(R.id.layoutLogout);// set biến ứng với layout ở view
         this.textName = findViewById(R.id.tvNameProfile);// set biến ứng với tên ở view
         this.imageView = findViewById(R.id.imageViewInfo);// set biến ứng với avatar ở view
+        this.tvPhoneDescription = findViewById(R.id.tvPhoneDescription);//Set biến với số đt người dùng hiển thị
     }
 
     private void setEvent() {
