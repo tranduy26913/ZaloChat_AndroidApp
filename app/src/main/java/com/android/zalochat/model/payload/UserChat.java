@@ -8,6 +8,15 @@ public class UserChat implements Serializable {
     private String message;
     private String phone;
     private String userId;
+    private String chatId;
+
+    public String getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
+    }
 
     public String getUserId() {
         return userId;
@@ -51,7 +60,7 @@ public class UserChat implements Serializable {
 
     public UserChat(){}
 
-    public UserChat(String avatar, String fullname, String message, String phone) {
+    public UserChat(String avatar, String fullname, String message, String phone,String chatId) {
         this.avatar = avatar;
         this.fullname = fullname;
         this.message = message;

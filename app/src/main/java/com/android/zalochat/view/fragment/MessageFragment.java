@@ -116,7 +116,8 @@ public class MessageFragment extends Fragment {
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                     if(task.isSuccessful()){
                                         if(task.getResult().exists()){
-                                            userChatList.add(UserMapping.EntityToUserchat(task.getResult().toObject(User.class),chat.getLastmessage()));
+                                            userChatList.add(UserMapping.EntityToUserchat(task.getResult().toObject(User.class)
+                                                    ,chat.getLastmessage(),chat.getId()));
                                             userChatAdapter.notifyDataSetChanged();
                                         }
                                     }

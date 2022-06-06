@@ -89,7 +89,7 @@ public class SearchActivity extends AppCompatActivity {
                         for (User user: objectArrayList ) {
                             if(!user.getUserId().equals(userOwn.getUserId())){
                                 if(user.getUserId().contains(query)){
-                                    userChatList.add(UserMapping.EntityToUserchat(user,""));
+                                    userChatList.add(UserMapping.EntityToUserchat(user,"",""));
                                 }
                             }
                         }

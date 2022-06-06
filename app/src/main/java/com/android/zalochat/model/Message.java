@@ -8,7 +8,7 @@ public class Message {
     protected String receiver;
     protected String content;
     protected long time;
-    protected String reaction;
+    protected int reaction;
     protected String type;
 
     public String getId() {
@@ -51,11 +51,11 @@ public class Message {
         this.time = time;
     }
 
-    public String getReaction() {
+    public int getReaction() {
         return reaction;
     }
 
-    public void setReaction(String reaction) {
+    public void setReaction(int reaction) {
         this.reaction = reaction;
     }
 
@@ -71,7 +71,7 @@ public class Message {
 
     }
 
-    public Message(String id, String sender, String receiver, String content, long time, String reaction, String type) {
+    public Message(String id, String sender, String receiver, String content, long time, int reaction, String type) {
         this.id = id;
         this.sender = sender;
         this.receiver = receiver;
