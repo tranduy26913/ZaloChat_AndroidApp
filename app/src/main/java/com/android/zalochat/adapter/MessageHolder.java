@@ -28,5 +28,6 @@ public class MessageHolder extends RecyclerView.ViewHolder {
         this.layoutMessageChatContent  =view.findViewById(R.id.layoutMessageChatContent);
         this.imgReaction = view.findViewById(R.id.imgReactionMessage);
         this.imgReaction.setZ(10);
+        this.imgAvatarMessage.setZ(10);
     }
 }

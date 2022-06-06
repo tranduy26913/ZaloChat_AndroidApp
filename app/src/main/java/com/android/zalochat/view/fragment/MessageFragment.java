@@ -54,7 +54,7 @@ import java.util.Map;
 
 public class MessageFragment extends Fragment {
 
-    private RecyclerView recyclerViewUserChat;
+    private RecyclerView recyclerViewUserChat;//Liên kết với RecyclerView số điện thoại
     private User userOwn;//Tài khoản của mình
     private FirebaseFirestore database;
     private UserChatAdapter userChatAdapter;
