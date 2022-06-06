@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.android.zalochat">
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <application
@@ -26,6 +27,18 @@
             android:exported="false" />
         <activity
             android:name=".view.VerifyPhoneActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.AccountSettingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.AccountChangeNameActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.ChangeAvatarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.AccountChangePasswordActivity"
             android:exported="false" />
         <activity
             android:name=".view.RegisterActivity"
