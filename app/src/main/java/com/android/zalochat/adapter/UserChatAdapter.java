@@ -17,8 +17,8 @@ import java.util.List;
 
 public class UserChatAdapter extends RecyclerView.Adapter<UserChatHolder> {
 
-    private List<UserChat> userChatList;
-    private IClickItemUserChatListener iClickItemUserChatListener;
+    private List<UserChat> userChatList;//Danh sách userchat
+    private IClickItemUserChatListener iClickItemUserChatListener;//Inteface để callback tới xử lý sự kiện click vào item
 
     public UserChatAdapter(List<UserChat> userChatList,IClickItemUserChatListener listener) {
         this.userChatList = userChatList;
@@ -34,11 +34,11 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull UserChatHolder holder, int position) {
-        UserChat chat = userChatList.get(position);
-        Picasso.get().load(chat.getAvatar()).into(holder.imgAvatar);
-        holder.tvDisplayNameUserChat.setText(chat.getFullname());
-        holder.tvDescriptionMessage.setText(chat.getMessage());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        UserChat chat = userChatList.get(position);//Lấy object userchat theo vị trí hiển thị
+        Picasso.get().load(chat.getAvatar()).into(holder.imgAvatar);//Load ảnh từ url đưa vào Avatar
+        holder.tvDisplayNameUserChat.setText(chat.getFullname());//Gắn giá trị fullname vào TextView DisplayNameUserChat
+        holder.tvDescriptionMessage.setText(chat.getMessage());//Gắn giá trị message vào TextView Descripton Message
+        holder.itemView.setOnClickListener(new View.OnClickListener() {//Gắn sự kiện onlick khi click vào item
             @Override
             public void onClick(View view) {
                 iClickItemUserChatListener.onClickItemUserChat(chat);
@@ -46,7 +46,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatHolder> {
         });
     }
 
-    @Override
+    @Override//Trả về số lượng các item
     public int getItemCount() {
         return userChatList.size();
     }

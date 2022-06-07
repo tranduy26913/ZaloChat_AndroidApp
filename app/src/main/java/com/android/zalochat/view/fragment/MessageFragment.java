@@ -108,27 +108,23 @@ public class MessageFragment extends Fragment {
                     Chat chat = doc.toObject(Chat.class);//Mapping từ Document sang object Chat
                     String idFriend ="";//lưu id của tài khoản khác
 
-                        for (String id:chat.getUsers()) {
-                            if(!id.equals(userOwn.getUserId())){
-                                idFriend = id;
+                        for (String id:chat.getUsers()) {//duyệt qua danh sách user id trong object Chat
+                            if(!id.equals(userOwn.getUserId())){//Nếu không phải tài khoản của mình
+                                idFriend = id;//Gắn id cho idFriend
                             }
                         }
 
-//                    if(chat.getReceiver().equals(userOwn.getUserId())){//Kiểm tra xem tài khoản kia là người gửi hay nhận
-//                        idFriend = chat.getSender();
-//                    }
-//                    else {
-//                        idFriend = chat.getReceiver();
-//                    }
                     Task<DocumentSnapshot> user = database.collection(Constants.USER_COLLECTION)
-                            .document(idFriend)
+                            .document(idFriend)//Tìm kiếm thông tin user có id = idFriend trong database
                             .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                     if(task.isSuccessful()){
                                         if(task.getResult().exists()){
+                                            //Mapping từ User sang UserChat rồi add vào danh sách Userchat
                                             userChatList.add(UserMapping.EntityToUserchat(task.getResult().toObject(User.class)
                                                     ,chat.getLastmessage(),chat.getId()));
+                                            //gọi hàm notify để thông báo cho adapter biết dữ liệu có sự thay đổi
                                             userChatAdapter.notifyDataSetChanged();
                                         }
                                     }
@@ -138,22 +134,24 @@ public class MessageFragment extends Fragment {
 
             }
         });
-
+//Khởi tạo môt User Chat Adapter
         userChatAdapter = new UserChatAdapter(userChatList, new IClickItemUserChatListener() {
+            //Hàm có nhiệm vụ định nghĩa sự kiện khi click vào item trong user chat adapter
             @Override
             public void onClickItemUserChat(UserChat userChat) {
                 GoToChatActivity(userChat);
             }
         });
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        recyclerViewUserChat.setAdapter(userChatAdapter);
-        recyclerViewUserChat.setLayoutManager(linearLayoutManager);
-        recyclerViewUserChat.setHasFixedSize(true);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());//Khai báo một LinearLayoutManager
+        recyclerViewUserChat.setAdapter(userChatAdapter);//Set adapter cho recycler View
+        recyclerViewUserChat.setLayoutManager(linearLayoutManager);//Set linearlayout cho recycler view nhằm định nghĩa layout khi hiển thị
+        recyclerViewUserChat.setHasFixedSize(true);//Set kích thước có thể chỉnh được
     }
 
-    private void GoToChatActivity(UserChat userChat) {
+    private void GoToChatActivity(UserChat userChat) {//Mở Chat activity
         Intent intent = new Intent(this.getContext(), ChatActivity.class);
-        intent.putExtra(Constants.USER_JSON,userChat);
+        intent.putExtra(Constants.USER_JSON,userChat);//Truyền thông tin UserChat qua Chat Activity
         startActivity(intent);
     }
 }
