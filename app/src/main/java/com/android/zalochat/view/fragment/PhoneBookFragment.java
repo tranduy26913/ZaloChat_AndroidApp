@@ -45,8 +45,8 @@ import java.util.List;
 public class PhoneBookFragment extends Fragment {
     private RecyclerView recyclerViewPhoneBook;
     private List<Contact> contactList;
-    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("dataZaloApp", getActivity().MODE_PRIVATE);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     private FirebaseFirestore database;
     CollectionReference userRef = database.collection(Constants.USER_COLLECTION);
@@ -75,7 +75,9 @@ public class PhoneBookFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerViewPhoneBook = view.findViewById(R.id.RecycleViewListUserPhoneBook);
+        editor = sharedPreferences.edit();
 
+        sharedPreferences = getActivity().getSharedPreferences("dataZaloApp", getActivity().MODE_PRIVATE);
         try {
             contactList = (ArrayList<Contact>) ObjectSerializer.deserialize(sharedPreferences.getString("contactData", ObjectSerializer.serialize(new ArrayList<Contact>())));
         } catch (IOException e) {
@@ -90,7 +92,7 @@ public class PhoneBookFragment extends Fragment {
     }
 
     private void LoadDataFromContact() {
-        if(contactList.size()==0){
+        if(contactList.isEmpty()){
             contactList = new ArrayList<>();
             Uri uriContact = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
             Cursor cursor;
@@ -137,6 +139,7 @@ public class PhoneBookFragment extends Fragment {
 
             try {
                 editor.putString("contactData", ObjectSerializer.serialize((Serializable) contactList));
+                editor.commit();
             } catch (IOException e) {
                 e.printStackTrace();
             }
