@@ -58,6 +58,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -152,18 +153,14 @@ public class ChatActivity extends AppCompatActivity {
         if (friendUser.getChatId().equals("")) {
             chatId = "";
             db.collection(Constants.CHAT_COLLECTION)
+                    .whereArrayContains("users",Arrays.asList(userOwn.getUserId(),friendUser.getUserId()))
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
                         public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                             Chat chat;
                             for (QueryDocumentSnapshot doc:value){
                                 chat = doc.toObject(Chat.class);
-                                if (chat.getSender().equals(userOwn.getUserId()) && chat.getReceiver().equals(friendUser.getUserId())) {
-                                    chatId = chat.getId();
-
-                                } else if (chat.getSender().equals(friendUser.getUserId()) && chat.getReceiver().equals(userOwn.getUserId())) {
-                                    chatId = chat.getId();
-                                }
+                                chatId = chat.getId();
                             }
                         }
                     });
@@ -252,11 +249,10 @@ public class ChatActivity extends AppCompatActivity {
     public void onClickSendMessage() {
         Chat chat;
         if (chatId.equals("")) {
-            chatId = userOwn.getUserId().concat(friendUser.getUserId());
-            chat = new Chat(chatId, userOwn.getUserId(), friendUser.getUserId(), (new Date()).getTime(), "Tin nhắn đầu tiên");
-            db.collection(Constants.CHAT_COLLECTION)
-                    .document(chatId)
-                    .set(chat);
+            DocumentReference chatRef = db.collection(Constants.CHAT_COLLECTION).document();
+            chatId = chatRef.getId();
+            chat = new Chat(chatId, Arrays.asList(userOwn.getUserId(), friendUser.getUserId()), (new Date()).getTime(), "Tin nhắn đầu tiên");
+            chatRef.set(chat);
             LoadMessage();
         }
         UUID uuid =  UUID.randomUUID();

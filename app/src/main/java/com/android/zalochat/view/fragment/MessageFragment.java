@@ -38,6 +38,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -48,6 +49,7 @@ import com.google.gson.Gson;
 
 import java.text.ParsePosition;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,10 +57,10 @@ import java.util.Map;
 public class MessageFragment extends Fragment {
 
     private RecyclerView recyclerViewUserChat;//Liên kết với RecyclerView số điện thoại
-    private User userOwn;//Tài khoản của mình
-    private FirebaseFirestore database;
-    private UserChatAdapter userChatAdapter;
-    private List<UserChat> userChatList = new ArrayList<>();
+    private User userOwn;//Biến lưu thông tin tài khoản của mình
+    private FirebaseFirestore database;//BIến lưu liên kết với database
+    private UserChatAdapter userChatAdapter;//Userchat Adapter
+    private List<UserChat> userChatList = new ArrayList<>();//Danh sách các tài khoản chat
     public MessageFragment() {
         // Required empty public constructor
     }
@@ -71,17 +73,17 @@ public class MessageFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        database = FirebaseFirestore.getInstance();
-        recyclerViewUserChat = view.findViewById(R.id.recyclerViewUserChat);
-        SharedPreferences ref = view.getContext().getSharedPreferences(Constants.SHAREPREF_USER, MODE_PRIVATE);
-        String jsonUser = ref.getString(Constants.USER_JSON, "");
+        database = FirebaseFirestore.getInstance();//Gắn instance vào biến database
+        recyclerViewUserChat = view.findViewById(R.id.recyclerViewUserChat);//Liên kết layout Recycler view Userchat với biến
+        SharedPreferences ref = view.getContext().getSharedPreferences(Constants.SHAREPREF_USER, MODE_PRIVATE);//Khai báo Shared Preferences
+        String jsonUser = ref.getString(Constants.USER_JSON, "");//Lấy thông tin tài khoản của mình từ Shared Preferences
         try {
-            Gson gson  = new Gson();
-            userOwn = gson.fromJson(jsonUser,User.class);
+            Gson gson  = new Gson();//Khai báo 1 Gson để làm việc với Json
+            userOwn = gson.fromJson(jsonUser,User.class);//Chuyển thông tin từ json sang object User để sử dụng
         }catch (Exception ex) {
             //GotoLogin();
         }
-        LoadUserChat();
+        LoadUserChat();//Load ra danh sách User Chat
     }
 
     @Override
@@ -92,23 +94,32 @@ public class MessageFragment extends Fragment {
     }
 
     private void LoadUserChat(){
-        // truy vấn vào nhánh username mà người dùng nhập
+        //Collection CHATS có nhiệm vụ đánh dấu 2 tài khoản có nhắn tin với nhau
+        //Chỉ khi 2 tài khoản có nhắn tin với nhau mới tạo thành 1 document Chat
+
+        // truy vấn vào nhánh id của Collection Chat để tìm ra danh sách những người có nhắn tin với mình
         CollectionReference chatRef = database.collection(Constants.CHAT_COLLECTION);
-        chatRef.whereGreaterThanOrEqualTo("id",userOwn.getUserId())
+        chatRef.whereArrayContains("users",userOwn.getUserId())
         .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                userChatList.clear();
-                for(QueryDocumentSnapshot doc:value){
-                    Chat chat = doc.toObject(Chat.class);
-                    String idFriend ="";
-                    if(chat.getReceiver().equals(userOwn.getUserId())){
-                        idFriend = chat.getSender();
-                    }
-                    else {
-                        idFriend = chat.getReceiver();
-                    }
+                userChatList.clear();//Xoá danh sách Userchat cũ
+                for(QueryDocumentSnapshot doc:value){//Duyệt qua từng document thoả điều kiện ở trên
+                    Chat chat = doc.toObject(Chat.class);//Mapping từ Document sang object Chat
+                    String idFriend ="";//lưu id của tài khoản khác
 
+                        for (String id:chat.getUsers()) {
+                            if(!id.equals(userOwn.getUserId())){
+                                idFriend = id;
+                            }
+                        }
+
+//                    if(chat.getReceiver().equals(userOwn.getUserId())){//Kiểm tra xem tài khoản kia là người gửi hay nhận
+//                        idFriend = chat.getSender();
+//                    }
+//                    else {
+//                        idFriend = chat.getReceiver();
+//                    }
                     Task<DocumentSnapshot> user = database.collection(Constants.USER_COLLECTION)
                             .document(idFriend)
                             .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
