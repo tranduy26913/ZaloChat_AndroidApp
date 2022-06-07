@@ -13,20 +13,7 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imgReactionMessage"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-       app:layout_constraintTop_toBottomOf="@id/layoutMessage"
-        android:background="@color/white"
-        android:layout_marginTop="-5dp"
-        android:layout_marginEnd="10dp"
-        app:shapeAppearanceOverlay="@style/circle"
-        android:src="@drawable/ic_like_border"
 
-        />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imgAvatarMessage"
@@ -43,12 +30,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/layoutMessage"
-        android:background="@drawable/bg_rounded_corner"
+
         android:layout_marginStart="10dp"
         android:layout_marginEnd="4dp"
         app:layout_constraintStart_toEndOf="@id/imgAvatarMessage"
         app:layout_constraintTop_toTopOf="parent"
         >
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imgReactionMessage"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutMessageChatContent"
+            android:background="@color/white"
+            android:layout_marginTop="-5dp"
+            android:layout_marginEnd="10dp"
+            app:shapeAppearanceOverlay="@style/circle"
+            android:src="@drawable/ic_like_border"
+
+            />
 
 
         <com.google.android.material.imageview.ShapeableImageView
@@ -67,6 +68,7 @@
             android:id="@+id/layoutMessageChatContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_rounded_corner"
             android:paddingStart="10dp"
             android:paddingTop="8dp"
             android:paddingEnd="10dp"

@@ -1,11 +1,21 @@
 package com.android.zalochat.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Chat {
     protected String id;
-    protected String sender;
-    protected String receiver;
+    protected List<String> users;
+
+    public List<String> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<String> users) {
+        this.users = users;
+    }
+
+    //protected String receiver;
     protected long lasttime;
     protected String lastmessage;
 
@@ -17,21 +27,6 @@ public class Chat {
         this.id = id;
     }
 
-    public String getSender() {
-        return sender;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
-
-    public String getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
-    }
 
     public long getLasttime() {
         return lasttime;
@@ -54,10 +49,9 @@ public class Chat {
     }
 
 
-    public Chat(String id,String sender, String receiver, long lasttime, String lastmessage) {
+    public Chat(String id,List<String> users, long lasttime, String lastmessage) {
         this.id = id;
-        this.sender = sender;
-        this.receiver = receiver;
+        this.users=users;
         this.lastmessage = lastmessage;
         this.lasttime = lasttime;
     }

@@ -5,7 +5,7 @@ import com.android.zalochat.model.payload.UserChat;
 
 import java.util.List;
 
-public class UserMapping {
+public class UserMapping {//Mapping từ object User sang object UserChat
     public static final UserChat EntityToUserchat(User user, String message,String chatId){
         UserChat userChat = new UserChat();
         userChat.setAvatar(user.getAvatar());

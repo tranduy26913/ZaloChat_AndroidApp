@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import com.android.zalochat.model.Message;
 import com.android.zalochat.model.payload.MessageChat;
 
-public class MessageMapping {
+public class MessageMapping {//Mapping từ Message sang MessageChat
     public static final MessageChat EntityToMessageChat(Message message, Bitmap avatar){
         MessageChat messageChat = new MessageChat();
         messageChat.setMessage(message);

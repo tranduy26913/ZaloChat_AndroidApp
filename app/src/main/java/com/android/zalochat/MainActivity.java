@@ -24,10 +24,10 @@ public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigation;
     private SearchView searchViewMain;
-    //new NavigationBarView.OnItemSelectedListener()
+
     private NavigationBarView.OnItemSelectedListener navListener = item -> {
         Fragment selectedFragment;
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.miMessage: {
                 selectedFragment = new MessageFragment();
                 break;
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frameLayoutMain,selectedFragment).commit();
+                .replace(R.id.frameLayoutMain, selectedFragment).commit();
         return true;
     };
 
@@ -54,11 +54,11 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnItemSelectedListener(navListener);
         bottomNavigation.setSelectedItemId(R.id.miMessage);
-        searchViewMain =findViewById(R.id.searchViewMain);
+        searchViewMain = findViewById(R.id.searchViewMain);
         searchViewMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               GoToSearch();
+                GoToSearch();
             }
         });
         searchViewMain.setOnSearchClickListener(new View.OnClickListener() {
@@ -71,27 +71,25 @@ public class MainActivity extends AppCompatActivity {
 
     private void CheckLogin() {
         SharedPreferences pref = getSharedPreferences(Constants.SHAREPREF_USER, MODE_PRIVATE);
-        Gson gson =new Gson();
+        Gson gson = new Gson();
         String userOwnJson = pref.getString(Constants.USER_JSON, "");//lấy json user từ share pref
-        if(userOwnJson.equals("")){
+        if (userOwnJson.equals("")) {
             GoToLogin();
-        }
-else {
+        } else {
 
             try {
                 User userOwn = gson.fromJson(userOwnJson, User.class);//parse sang class User
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 GoToLogin();
                 Toast.makeText(this, "Phiên làm việc đã hết. Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
             }
         }
-
-
     }
 
     private void GoToLogin() {
-        Intent intent= new Intent(this, LoginActivity.class);
-        startActivity(intent);finish();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void GoToSearch() {

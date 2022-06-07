@@ -19,8 +19,8 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
-    List<UserChat> userList;
-    Context context;
+    private List<UserChat> userList;//Danh sách user tìm kiếm được
+    private Context context;//Context chứa Recycler view
 
     public SearchAdapter(Context context,List<UserChat> userList){
         this.userList = userList;
@@ -35,29 +35,31 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull SearchHolder holder, int position) {
-        UserChat user =userList.get(position);
+        UserChat user =userList.get(position);//lấy userchat theo vị trí hiển thị
         try{
-            holder.tvDisplayNameSearch.setText(user.getFullname());
+            holder.tvDisplayNameSearch.setText(user.getFullname());//gắn fullname vào DisplayNameSearch
             holder.btnStartChat.setOnClickListener(new View.OnClickListener() {
                 @Override
+                //Xử lý sự kiện khi bấm vào item
                 public void onClick(View view) {
                     GoToChat(user);
                 }
             });
-            Picasso.get().load(user.getAvatar()).into(holder.imgAvatarSearch);
+            Picasso.get().load(user.getAvatar()).into(holder.imgAvatarSearch);//Load hình ảnh từ url vào avatar
         }catch (Exception ex){
 
         }
     }
 
+    //Mở chat activity
     private void GoToChat(UserChat user) {
         Intent intent = new Intent(context, ChatActivity.class);
-        intent.putExtra(Constants.USER_JSON,user);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        intent.putExtra(Constants.USER_JSON,user);//Truyền thông tin user vào intent
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//Thiết lập flag đánh dấu mở một activity mới
+        context.startActivity(intent);//Mở activity
     }
 
-    @Override
+    @Override//Trả về số lượng item
     public int getItemCount() {
         return userList.size();
     }

@@ -33,47 +33,47 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class EnterCodeOtpActivity extends AppCompatActivity {
 
-    private String phonenumber;
-    private String verificationId;
-    Button btnVerify;
-    EditText txtVerifyCode;
+    private String phonenumber;//Biến lưu số điện thoại cần kích hoạt
+    private String verificationId;//Biến lưu verification id
+    Button btnVerify;//Liên kết tới phần tử Button Verify
+    EditText txtVerifyCode;//Liên kết tới phần tử TextView Verifycode
 
-    FirebaseAuth mAuth;
+    FirebaseAuth mAuth;//Liên kết tới Firebase authentication
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_enter_code_otp);
-        btnVerify = findViewById(R.id.btnVerify);
-        txtVerifyCode = findViewById(R.id.txtVerifyCode);
-        mAuth = FirebaseAuth.getInstance();
-        getDataIntent();
+        setContentView(R.layout.activity_enter_code_otp);//Thiết lập giao diện activity_enter_code_otp
+        btnVerify = findViewById(R.id.btnVerify);//Gắn layout btnVerify cho biến
+        txtVerifyCode = findViewById(R.id.txtVerifyCode);//Gắn layout txtVerifyCode
+        mAuth = FirebaseAuth.getInstance();//Lấy instance của firebase authentication
+        getDataIntent();//Lấy dữ liệu từ intent
     }
-
+    //Lấy dữ liệu từ intent
     private void getDataIntent(){
-        verificationId = getIntent().getStringExtra("verificationId");
-        phonenumber = getIntent().getStringExtra("phonenumber");
+        verificationId = getIntent().getStringExtra("verificationId");//Lấy giá trị verification từ intent gắn vào biến
+        phonenumber = getIntent().getStringExtra("phonenumber");//Lấy giá trị phone number từ intent gắn vào biến
     }
 
     public void onClickVerify(View view){
+        //Khai báo PhoneAuthCredential dùng để xác thực code otp
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, txtVerifyCode.getText().toString());
-signInWithPhoneAuthCredential(credential);
+signInWithPhoneAuthCredential(credential);//Đăng nhập với credential (Xác thực code otp)
     }
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
 
-        mAuth.signInWithCredential(credential)
+        mAuth.signInWithCredential(credential)//Gọi hàm Xác thực của Firebase Authentication
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
+                        if (task.isSuccessful()) {//Nếu thành công
                             Toast.makeText(EnterCodeOtpActivity.this,"Xác thực thành công",Toast.LENGTH_SHORT).show();
                             FirebaseUser user = task.getResult().getUser();
-                            ActiveUser(phonenumber);
-                            GoToLogin(phonenumber);
+                            ActiveUser(phonenumber);//Kích hoạt cho tài khoản trên firebase
+                            GoToLogin(phonenumber);//Đi đến Login
                             finish();
                         } else {
                             // Sign in failed, display a message and update the UI
-
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 Toast.makeText(EnterCodeOtpActivity.this,"Xác thực thất bại",Toast.LENGTH_SHORT).show();
                             }
@@ -82,19 +82,17 @@ signInWithPhoneAuthCredential(credential);
                 });
     }
 
-    private void ActiveUser(String phonenumber) {
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference users = firebaseDatabase.getReference("USERS").child(phonenumber);
+    private void ActiveUser(String phonenumber) {//Kích hoạt tài khoản
+        FirebaseFirestore database = FirebaseFirestore.getInstance();//Khai báo database kết nối tới Firestore
         database.collection(Constants.USER_COLLECTION)
                 .document(phonenumber)
-                .update("active",true);
+                .update("active",true);//update lại field active = True của document User
     }
 
-    private void GoToLogin(String phonenumber){
+    private void GoToLogin(String phonenumber){//Mở activity Login
         Intent intent = new Intent(this, LoginActivity.class);
-        intent.putExtra("phonenumber",phonenumber);
-        startActivity(intent);
+        intent.putExtra("phonenumber",phonenumber);//Truyền giá trị phonenumber qua intent
+        startActivity(intent);//Mở activity
     }
 
 }
