@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.zalochat.R;
 import com.android.zalochat.adapter.ContactAdapter;
+import com.android.zalochat.adapter.SearchAdapter;
 import com.android.zalochat.adapter.UserChatAdapter;
 import com.android.zalochat.event.IClickItemUserChatListener;
+import com.android.zalochat.mapping.UserMapping;
 import com.android.zalochat.model.Contact;
 import com.android.zalochat.model.User;
 import com.android.zalochat.model.payload.UserChat;
@@ -32,9 +35,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -44,15 +50,15 @@ import java.util.List;
 
 public class PhoneBookFragment extends Fragment {
     private RecyclerView recyclerViewPhoneBook;
-    private List<Contact> contactList;
-    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("dataZaloApp", getActivity().MODE_PRIVATE);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
+    protected List<Contact> contactList;
+    ContactAdapter adapter;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+    User userOwn;
 
-    private FirebaseFirestore database;
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();;
     CollectionReference userRef = database.collection(Constants.USER_COLLECTION);
-
-    private int flag = 0;
-
+    private int flag = 0 ;
 
     public PhoneBookFragment() {
         // Required empty public constructor
@@ -75,23 +81,23 @@ public class PhoneBookFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerViewPhoneBook = view.findViewById(R.id.RecycleViewListUserPhoneBook);
-
+        contactList = new ArrayList<>();
+        SharedPreferences ref = getActivity().getSharedPreferences(Constants.SHAREPREF_USER,getActivity().MODE_PRIVATE);//Khai báo SharedPreferences
+        String jsonUser = ref.getString(Constants.USER_JSON, "");//Lấy json của user từ sharedPreferences
         try {
-            contactList = (ArrayList<Contact>) ObjectSerializer.deserialize(sharedPreferences.getString("contactData", ObjectSerializer.serialize(new ArrayList<Contact>())));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            Gson gson  = new Gson();//Gson thực hiện các xử lý liên quan đến json
+            userOwn = gson.fromJson(jsonUser,User.class);//CHuyển từ json sang object User
+        }catch (Exception ex) {
+            //GotoLogin();
         }
 
         LoadDataFromContact();
 
-        LoadDataToAdapter();
+        //LoadDataToAdapter();
     }
 
     private void LoadDataFromContact() {
-        if(contactList.size()==0){
-            contactList = new ArrayList<>();
+        if(contactList.isEmpty()){
             Uri uriContact = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
             Cursor cursor;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -105,47 +111,53 @@ public class PhoneBookFragment extends Fragment {
                 String idName = ContactsContract.Contacts.DISPLAY_NAME;
                 String idPhone = ContactsContract.CommonDataKinds.Phone.NUMBER;
                 int colNameIndex = cursor.getColumnIndex(idName);
-                int colPhoneIndex=cursor.getColumnIndex(idPhone);
+                int colPhoneIndex = cursor.getColumnIndex(idPhone);
                 String name = cursor.getString(colNameIndex);
                 String phone = cursor.getString(colPhoneIndex);
+                if(phone.equals(userOwn.getPhone())){
+                    continue;
+                }
                 Contact newContact = new Contact();
                 newContact.setPhone(phone);
+                Log.e("SIZE", "ContactNumber: "+newContact.getPhone(),null);
                 newContact.setFullname(name);
+                contactList.add(newContact);
+                Log.e("SIZE", "LoadDataFromContact: "+contactList.size(),null);
+            }
+
+            for(Contact newContact : contactList){
                 userRef.whereEqualTo("phone",newContact.getPhone()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if(task.isSuccessful()){
                             for(QueryDocumentSnapshot doc: task.getResult()){
-                                User oldUser = doc.toObject(User.class);
-                                newContact.setAvatar(oldUser.getAvatar());
-                                newContact.setFullname(oldUser.getFullname());
-                                flag = 1;
-                                break;
+                                if(!newContact.getPhone().equals(userOwn.getUserId())){//Loại bỏ trường hợp tự tìm bản thân
+                                    User oldUser = doc.toObject(User.class);
+                                    newContact.setAvatar(oldUser.getAvatar());
+                                    newContact.setFullname(oldUser.getFullname());
+                                    newContact.setUser(true);
+                                    newContact.setOnline(oldUser.isOnline());
+                                    newContact.setActive(oldUser.isActive());
+                                    newContact.setUserId(oldUser.getUserId());
+                                }
                             }
                         }
+                        adapter = new ContactAdapter(getContext(),contactList);
+                        adapter.notifyDataSetChanged();
+                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+                        recyclerViewPhoneBook.setAdapter(adapter);
+                        recyclerViewPhoneBook.setLayoutManager(linearLayoutManager);
+                        recyclerViewPhoneBook.setHasFixedSize(true);
                     }
                 });
-
-                if(flag == 1){
-                    flag = 0 ;
-                    contactList.add(newContact);
-                }
-                else{
-                    contactList.add(newContact);
-                }
-            }
-
-            try {
-                editor.putString("contactData", ObjectSerializer.serialize((Serializable) contactList));
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }
 
     private void LoadDataToAdapter() {
-        ContactAdapter contactAdapter = new ContactAdapter(getActivity(),contactList);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        Log.e("SIZE", "START LOADING DATA FOR ADAPTER",null);
+        ContactAdapter contactAdapter = new ContactAdapter(this.getContext(),contactList);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerViewPhoneBook.setAdapter(contactAdapter);
         recyclerViewPhoneBook.setLayoutManager(linearLayoutManager);
         recyclerViewPhoneBook.setHasFixedSize(true);

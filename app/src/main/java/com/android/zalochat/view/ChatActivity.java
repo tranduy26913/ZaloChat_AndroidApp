@@ -41,6 +41,7 @@ import com.android.zalochat.adapter.MessageAdapter;
 import com.android.zalochat.mapping.MessageMapping;
 import com.android.zalochat.model.Chat;
 import com.android.zalochat.model.Message;
+import com.android.zalochat.model.Upload;
 import com.android.zalochat.model.User;
 import com.android.zalochat.model.payload.MessageChat;
 import com.android.zalochat.model.payload.UserChat;
@@ -290,6 +291,14 @@ public class ChatActivity extends AppCompatActivity {
                         db.collection(Constants.CHAT_COLLECTION)
                                 .document(chatId)
                                 .update("lastmessage","[Hình ảnh]");//Cập nhật lại thông tin của document Chat trên database
+
+                        DocumentReference uploadRef = db.collection(Constants.UPLOAD_COLLECTION).document(userOwn.getUserId());//Tạo một DocumentReference liên kết tới database
+                        DocumentReference subuploadRef = uploadRef.collection(Constants.SUBUPLOAD_COLLECTION).document();//Tạo một DocumentReference liên kết tới database
+                        Upload newUpload = new Upload();
+                        newUpload.setUrl("IMAGES/"+uuid.toString());
+                        newUpload.setUserId(userOwn.getUserId());
+                        newUpload.setDate(new Date().getTime());
+                        subuploadRef.set(newUpload);
                     }
                 }
             });

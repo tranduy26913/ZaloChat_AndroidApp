@@ -1,7 +1,9 @@
 package com.android.zalochat;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +12,9 @@ import android.view.View;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.android.zalochat.adapter.SearchAdapter;
+import com.android.zalochat.mapping.UserMapping;
+import com.android.zalochat.model.Upload;
 import com.android.zalochat.model.User;
 import com.android.zalochat.util.Constants;
 import com.android.zalochat.view.LoginActivity;
@@ -18,12 +23,25 @@ import com.android.zalochat.view.fragment.PhoneBookFragment;
 import com.android.zalochat.view.fragment.AccountFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigation;
     private SearchView searchViewMain;
+    SharedPreferences sharedPreferences;
+    private FirebaseFirestore db =FirebaseFirestore.getInstance();
+    User userOwn;
 
     private NavigationBarView.OnItemSelectedListener navListener = item -> {
         Fragment selectedFragment;
@@ -67,6 +85,17 @@ public class MainActivity extends AppCompatActivity {
                 GoToSearch();
             }
         });
+
+        SharedPreferences ref = getSharedPreferences(Constants.SHAREPREF_USER,MODE_PRIVATE);//Khai báo SharedPreferences
+        String jsonUser = ref.getString(Constants.USER_JSON, "");//Lấy json của user từ sharedPreferences
+        try {
+            Gson gson  = new Gson();//Gson thực hiện các xử lý liên quan đến json
+            userOwn = gson.fromJson(jsonUser,User.class);//CHuyển từ json sang object User
+        }catch (Exception ex) {
+            //GotoLogin();
+        }
+
+        CheckImage();
     }
 
     private void CheckLogin() {
@@ -96,5 +125,27 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SearchActivity.class);
         startActivity(intent);
     }
+    private void CheckImage(){
+        Long now = new Date().getTime();
+        DocumentReference uploadRef = db.collection(Constants.UPLOAD_COLLECTION).document(userOwn.getUserId());//Tạo một DocumentReference liên kết tới database
 
+        uploadRef.collection(Constants.SUBUPLOAD_COLLECTION).whereLessThan("date",now - 100*24*60*60*14).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageRef = storage.getReference();
+                for (QueryDocumentSnapshot doc:value) {//duyệt qua từng document kết quả
+                    Upload upload = doc.toObject(Upload.class);
+                    try{
+                        StorageReference desertRef = storageRef.child(upload.getUrl());
+                        desertRef.delete();
+                    }
+                    catch (Exception e){
+
+                    }
+                    uploadRef.collection(Constants.SUBUPLOAD_COLLECTION).document(doc.getId()).delete();
+                }
+            }
+        });
+    }
 }
