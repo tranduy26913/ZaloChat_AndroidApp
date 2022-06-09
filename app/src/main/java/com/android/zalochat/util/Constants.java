@@ -9,6 +9,8 @@ public class Constants {//Chứa các biến Constains của hệ thống
     public static final String IMAGE ="IMAGE";//Định nghĩa biến IMAGE, dùng khi tạo tin nhắn ảnh
     public static final String SOUND = "SOUND";//Định nghĩa biến SOUND, dùng khi tạo tin nhắn âm thanh
     public static final String FILE = "FILE";//Định nghĩa biến FILE, dùng khi tạo tin nhắn gửi file
+    public static final String UPLOAD_COLLECTION = "UPLOAD";//Định nghĩa biến USER_JSON
+    public static final String SUBUPLOAD_COLLECTION = "SUBUPLOAD";//Định nghĩa biến USER_JSON
     public static final String USER_COLLECTION = "USERS";//Định nghĩa biến USER_COLLECTION, dùng để định nghĩa tên của Collection user trên database
     public static final String CHAT_COLLECTION = "CHATS";//Định nghĩa biến CHAT_COLLECTION, dùng để định nghĩa tên của Collection chat trên database
     public static final String MESSAGE_COLLECTION = "MESSAGES";//Định nghĩa biến MESSAGE_COLLECTION, dùng để định nghĩa tên của Collection message trên database
