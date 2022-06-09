@@ -1,12 +1,14 @@
 package com.android.zalochat.adapter;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.zalochat.R;
 import com.android.zalochat.model.Contact;
 import com.squareup.picasso.Picasso;
 
@@ -24,22 +26,22 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactHolder> {
     @NonNull
     @Override
     public ContactHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+        return new ContactHolder(LayoutInflater.from(context).inflate(R.layout.item_user_phone_book,parent,false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ContactHolder holder, int position) {
         Contact contact = contactList.get(position);
         holder.tvDescriptionMessagePhoneBook.setText("");
-        if(contact.getAvatar()!= null){
-            Picasso.get().load(contact.getAvatar()).into(holder.imgAvatarUserChatPhoneBook);
-        }
+//        if(contact.getAvatar()!= null){
+//            Picasso.get().load(contact.getAvatar()).into(holder.imgAvatarUserChatPhoneBook);
+//        }
         holder.tvDisplayNameUserChatPhoneBook.setText(contact.getFullname());
     }
 
     @Override
     public int getItemCount() {
-        if(contactList != null){
+        if(contactList == null){
             return 0;
         }
         else{

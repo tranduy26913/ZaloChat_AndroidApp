@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,15 +45,12 @@ import java.util.List;
 
 public class PhoneBookFragment extends Fragment {
     private RecyclerView recyclerViewPhoneBook;
-    private List<Contact> contactList;
+    protected List<Contact> contactList;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
-    private FirebaseFirestore database;
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();;
     CollectionReference userRef = database.collection(Constants.USER_COLLECTION);
-
-    private int flag = 0;
-
 
     public PhoneBookFragment() {
         // Required empty public constructor
@@ -75,9 +73,8 @@ public class PhoneBookFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerViewPhoneBook = view.findViewById(R.id.RecycleViewListUserPhoneBook);
-        editor = sharedPreferences.edit();
-
         sharedPreferences = getActivity().getSharedPreferences("dataZaloApp", getActivity().MODE_PRIVATE);
+        editor= sharedPreferences.edit();
         try {
             contactList = (ArrayList<Contact>) ObjectSerializer.deserialize(sharedPreferences.getString("contactData", ObjectSerializer.serialize(new ArrayList<Contact>())));
         } catch (IOException e) {
@@ -85,15 +82,14 @@ public class PhoneBookFragment extends Fragment {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
+        Log.e("SIZE", "START LOADING DATA FROM CONTACT",null);
         LoadDataFromContact();
-
+        Log.e("SIZE", "LoadDataFromContact after: "+contactList.size(),null);
         LoadDataToAdapter();
     }
 
     private void LoadDataFromContact() {
         if(contactList.isEmpty()){
-            contactList = new ArrayList<>();
             Uri uriContact = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
             Cursor cursor;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -107,7 +103,7 @@ public class PhoneBookFragment extends Fragment {
                 String idName = ContactsContract.Contacts.DISPLAY_NAME;
                 String idPhone = ContactsContract.CommonDataKinds.Phone.NUMBER;
                 int colNameIndex = cursor.getColumnIndex(idName);
-                int colPhoneIndex=cursor.getColumnIndex(idPhone);
+                int colPhoneIndex = cursor.getColumnIndex(idPhone);
                 String name = cursor.getString(colNameIndex);
                 String phone = cursor.getString(colPhoneIndex);
                 Contact newContact = new Contact();
@@ -121,20 +117,12 @@ public class PhoneBookFragment extends Fragment {
                                 User oldUser = doc.toObject(User.class);
                                 newContact.setAvatar(oldUser.getAvatar());
                                 newContact.setFullname(oldUser.getFullname());
-                                flag = 1;
-                                break;
                             }
                         }
                     }
                 });
-
-                if(flag == 1){
-                    flag = 0 ;
-                    contactList.add(newContact);
-                }
-                else{
-                    contactList.add(newContact);
-                }
+                contactList.add(newContact);
+                Log.e("SIZE", "LoadDataFromContact: "+contactList.size(),null);
             }
 
             try {
@@ -147,8 +135,9 @@ public class PhoneBookFragment extends Fragment {
     }
 
     private void LoadDataToAdapter() {
-        ContactAdapter contactAdapter = new ContactAdapter(getActivity(),contactList);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        Log.e("SIZE", "START LOADING DATA FOR ADAPTER",null);
+        ContactAdapter contactAdapter = new ContactAdapter(this.getContext(),contactList);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerViewPhoneBook.setAdapter(contactAdapter);
         recyclerViewPhoneBook.setLayoutManager(linearLayoutManager);
         recyclerViewPhoneBook.setHasFixedSize(true);
