@@ -553,6 +553,7 @@ public class ChatActivity extends AppCompatActivity {
     public void onClickCancelSendImage(View view) {
         imgSendMessage.setImageBitmap(null);//Gắn giá trị null cho imgSend
         layoutImgSendMessage.setVisibility(GONE);//Ẩn layout chọn ảnh
+        ///helloeojfiokshiofhsdfuisd
     }
 
     public boolean checkPermissions() {
