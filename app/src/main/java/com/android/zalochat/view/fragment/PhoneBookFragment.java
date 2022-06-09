@@ -45,7 +45,7 @@ import java.util.List;
 public class PhoneBookFragment extends Fragment {
     private RecyclerView recyclerViewPhoneBook;
     private List<Contact> contactList;
-    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("dataZaloApp", getActivity().MODE_PRIVATE);
+    SharedPreferences sharedPreferences = getContext().getSharedPreferences("dataZaloApp", getActivity().MODE_PRIVATE);
     SharedPreferences.Editor editor = sharedPreferences.edit();
 
     private FirebaseFirestore database;

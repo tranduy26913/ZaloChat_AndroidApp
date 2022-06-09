@@ -17,7 +17,7 @@
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/fragment_message.xml" value="0.1" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/fragment_phone_book.xml" value="0.1" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/fragment_profile.xml" value="0.1" />
-        <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/item_message_receiver.xml" value="0.49872122762148335" />
+        <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/item_message_receiver.xml" value="0.5279503105590062" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/item_message_sender.xml" value="0.33" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/item_search_user.xml" value="0.2" />
         <entry key="..\:/HT/hk6/LTDD/Homework/ZaloChat/app/src/main/res/layout/item_user_chat.xml" value="0.17527173913043478" />
@@ -39,23 +39,6 @@
         <entry key="..\:/Study/3rd2nd/Mobile/Zalo/ZaloChat/app/src/main/res/layout/item_message_sender.xml" value="0.25" />
         <entry key="..\:/Study/3rd2nd/Mobile/Zalo/ZaloChat/app/src/main/res/layout/item_user_chat.xml" value="0.25" />
         <entry key="..\:/Study/3rd2nd/Mobile/Zalo/ZaloChat/app/src/main/res/menu/bot_nav_menu.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/activity_account.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/activity_account_change_avatar.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/activity_account_change_name.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/activity_account_change_password.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/activity_account_setting.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/activity_chat.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/activity_main.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/activity_verify_phone.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/fragment_account.xml" value="0.30092592592592593" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/fragment_account_change_password.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/fragment_account_setting.xml" value="0.4" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/fragment_edit_name.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/fragment_message.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/fragment_phone_book.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/fragment_profile.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/layout/item_user_chat.xml" value="0.25" />
-        <entry key="..\:/Study/3rd2nd/Mobile/final/app/src/main/res/menu/bot_nav_menu.xml" value="0.25" />
         <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.17777777777777778" />
         <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.26614583333333336" />
         <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/drawable/ic_baseline_format_list_bulleted_24.xml" value="0.26614583333333336" />
@@ -73,6 +56,13 @@
         <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/layout/activity_register.xml" value="0.16893115942028986" />
         <entry key="..\:/Users/ADMIN/Desktop/ZaloChat/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.17407407407407408" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat_AndroidApp/app/src/main/res/drawable/button_round_rec.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat_AndroidApp/app/src/main/res/drawable/ic_baseline_mic_24_white.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat_AndroidApp/app/src/main/res/drawable/round_button_rec.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat_AndroidApp/app/src/main/res/layout/activity_chat.xml" value="0.2" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat_AndroidApp/app/src/main/res/layout/item_message_receiver.xml" value="0.20652173913043478" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat_AndroidApp/app/src/main/res/layout/item_message_sender.xml" value="0.20652173913043478" />
+        <entry key="..\:/Users/ADMIN/Desktop/ZaloChat_AndroidApp/app/src/main/res/layout/item_user_chat.xml" value="0.20652173913043478" />
       </map>
     </option>
   </component>

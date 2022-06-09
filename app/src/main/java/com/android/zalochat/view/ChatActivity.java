@@ -1,5 +1,7 @@
 package com.android.zalochat.view;
 
+import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.view.View.GONE;
 
 import androidx.activity.result.ActivityResult;
@@ -10,22 +12,30 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.JsonWriter;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -75,7 +85,9 @@ import com.squareup.picasso.Target;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -86,10 +98,10 @@ import java.util.UUID;
 
 public class ChatActivity extends AppCompatActivity {
     //Liên kết đến các phần tử ImageButton Back, Call, VideoCall, ChatSetting, Emoji, MoreHoz, RecSound, GetImage, Send trên layout
-    ImageButton btnBack, btnCall, btnVideoCall, btnChatSetting, btnEmoji, btnMoreHoz, btnRecSound, btnGetImage, btnSend;
-    TextView txtUserName, txtOnlineStatus;//Liên kết đến các phần tử TextView Username và Online Status
+    ImageButton btnBack, btnCall, btnVideoCall, btnChatSetting, btnEmoji, btnMoreHoz, btnRecSound, btnGetImage, btnSend, btn_hold_to_rec_sound, btn_cancel_rec, btn_hand_rec;
+    TextView txtUserName, txtOnlineStatus, txt_instruction_rec;//Liên kết đến các phần tử TextView Username và Online Status
     EditText txtBodyMessage;//Liên kết đến phần tử EditText BodyMessage trên layout
-    LinearLayout chat_bar;//Liên kết đến phần tử LinearLayout chat_bar trên layout
+    LinearLayout chat_bar, linear_rec_sound, round_button;//Liên kết đến phần tử LinearLayout chat_bar trên layout
     ConstraintLayout layoutImgSendMessage;//Liên kết đến phần tử ConstraintLayout ImgSendMessage trên layout
     ImageView imgSendMessage;//Liên kết đến phần tử ImageView imgSendMessage trên layout
     String chatId;//Biến lưu chatId
@@ -102,9 +114,19 @@ public class ChatActivity extends AppCompatActivity {
     MessageAdapter messageAdapter;//Adapter của Message, chịu trách nhiệm hiển thị danh sách tin nhắn
     private SharedPreferences pref;//Biến lưu SharedPreferences
     private Uri fileImageSend;//Biến lưu Uri của file ảnh trong máy khi chọn ảnh để gửi đi
+    private Uri fileAudioSend;
     private UploadTask uploadTask;//Biến lưu tác vụ Upload ảnh lên database Firebase
-    final Gson gson =new Gson();//Khai báo một Gson chịu trách nhiệm xử lý liên quan đến dữ liệu json
-    private FirebaseFirestore db =FirebaseFirestore.getInstance();//Lấy instance của Database Firestore
+    final Gson gson = new Gson();//Khai báo một Gson chịu trách nhiệm xử lý liên quan đến dữ liệu json
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();//Lấy instance của Database Firestore
+    // creating a variable for medi recorder object class.
+    private MediaRecorder mRecorder;
+    // creating a variable for mediaplayer class
+    private MediaPlayer mPlayer;
+    // string variable is created for storing a file name
+    private static String fileAudioPath = null;
+    // constant for storing audio permission
+    public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,16 +135,18 @@ public class ChatActivity extends AppCompatActivity {
         addEvent();//Thực hiện thêm các sự kiện cho control
         pref = getSharedPreferences(Constants.SHAREPREF_USER, MODE_PRIVATE);//Khai báo SharedPredferences
         String userOwnJson = pref.getString(Constants.USER_JSON, "");//lấy json user từ share pref
-        userOwn = gson.fromJson(userOwnJson,User.class);//parse sang class User
+        userOwn = gson.fromJson(userOwnJson, User.class);//parse sang class User
         Picasso.get().load(userOwn.getAvatar()).into(new Target() {//Load ảnh avatar
             @Override//Sau khi ảnh được load
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 myAvatar = bitmap;
             }
+
             @Override
             public void onBitmapFailed(Exception e, Drawable errorDrawable) {
 
             }
+
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
 
@@ -131,6 +155,7 @@ public class ChatActivity extends AppCompatActivity {
         loadDataIntent();//Load dữ liệu được truyền thông qua intent
 
     }
+
     //Load dữ liệu được truyền thông qua intent
     private void loadDataIntent() {
 
@@ -141,10 +166,12 @@ public class ChatActivity extends AppCompatActivity {
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 friendAvatar = bitmap;//gắn avatar của người nhận vào friendAvatar để hiển thị lên giao diện
             }
+
             @Override
             public void onBitmapFailed(Exception e, Drawable errorDrawable) {
 
             }
+
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
 
@@ -154,12 +181,12 @@ public class ChatActivity extends AppCompatActivity {
             chatId = "";//Gắn chuỗi rỗng để tránh lỗi null
             db.collection(Constants.CHAT_COLLECTION)//tìm kiếm trên Collection CHATS
                     //Tìm kiếm xem có tồn tại document Chat nào mà có danh sách users bao gồm id của userOwn (người gửi) và friendUser (người nhận)
-                    .whereArrayContains("users",Arrays.asList(userOwn.getUserId(),friendUser.getUserId()))
+                    .whereArrayContains("users", Arrays.asList(userOwn.getUserId(), friendUser.getUserId()))
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
                         public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                             Chat chat;
-                            for (QueryDocumentSnapshot doc:value){//Duyệt qua danh sách các document tìm được
+                            for (QueryDocumentSnapshot doc : value) {//Duyệt qua danh sách các document tìm được
                                 chat = doc.toObject(Chat.class);//Ép kiểu sang object Chat
                                 chatId = chat.getId();//Gắn giá trị cho chatId
                             }
@@ -167,12 +194,13 @@ public class ChatActivity extends AppCompatActivity {
                     });
         } else//Trường hợp có chatId
             chatId = friendUser.getChatId();
-        if(!chatId.equals(""))//Nếu chatId khác chuỗi rỗng
+        if (!chatId.equals(""))//Nếu chatId khác chuỗi rỗng
             LoadMessage();//Load ra danh sách tin nhắn
     }
 
 
     //Thêm các sự kiện cho các control cần thiết
+    @SuppressLint("ClickableViewAccessibility")
     private void addEvent() {
         //Xử lý sự kiện khi nhập tin nhắn vào khung chat
         txtBodyMessage.addTextChangedListener(new TextWatcher() {
@@ -224,6 +252,105 @@ public class ChatActivity extends AppCompatActivity {
                 imageChooser();
             }
         });
+        btnRecSound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showRecordSoundWidget();
+            }
+        });
+        btn_hold_to_rec_sound.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                float tempX = event.getX();
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    startRecording();
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    pauseRecording();
+                    if (tempX <= -120) {
+                        //xóa ghi âm
+                        fileAudioPath = null;
+                        btn_cancel_rec.setVisibility(GONE);
+                        btn_hand_rec.setVisibility(GONE);
+                    } else {
+                        onClickSendMessage();
+                    }
+                } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    if (tempX <= -120) {
+                        btn_cancel_rec.setVisibility(View.VISIBLE);
+                        btn_hand_rec.setVisibility(View.VISIBLE);
+                    } else {
+                        btn_cancel_rec.setVisibility(GONE);
+                        btn_hand_rec.setVisibility(GONE);
+                    }
+                }
+                return true;
+            }
+        });
+    }
+
+    private void pauseRecording() {
+        txt_instruction_rec.setText("Nhấn giữ để ghi âm");
+        // the audio recording.
+        mRecorder.stop();
+
+        // below method will release
+        // the media recorder class.
+        mRecorder.release();
+        mRecorder = null;
+    }
+
+    private void startRecording() {
+        txt_instruction_rec.setText("Thả ra để gửi, di chuyển sang trái để xóa");
+        fileAudioPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        fileAudioPath += "/AudioRecording.3gp";
+
+        // below method is used to initialize
+        // the media recorder class
+        mRecorder = new MediaRecorder();
+
+        // below method is used to set the audio
+        // source which we are using a mic.
+        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+
+        // below method is used to set
+        // the output format of the audio.
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+
+        // below method is used to set the
+        // audio encoder for our recorded audio.
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        // below method is used to set the
+        // output file location for our recorded audio
+        mRecorder.setOutputFile(fileAudioPath);
+        try {
+            // below method will prepare
+            // our audio recorder class
+            mRecorder.prepare();
+        } catch (IOException e) {
+            Log.e("TAG", "prepare() failed");
+        }
+        // start method will start
+        // the audio recording.
+        mRecorder.start();
+    }
+
+    private void showRecordSoundWidget() {
+        if (checkPermissions()) {
+            if (linear_rec_sound.getVisibility() == View.VISIBLE) {
+                linear_rec_sound.setVisibility(GONE);
+                linear_rec_sound.getLayoutParams().height = 0;
+                round_button.getLayoutParams().height = 0;
+                btn_hold_to_rec_sound.getLayoutParams().height = 0;
+            } else if (linear_rec_sound.getVisibility() == GONE) {
+                linear_rec_sound.setVisibility(View.VISIBLE);
+                linear_rec_sound.getLayoutParams().height = 500;
+                round_button.getLayoutParams().height = 200;
+                btn_hold_to_rec_sound.getLayoutParams().height = 200;
+            }
+        } else {
+            requestPermissions();
+        }
 
     }
 
@@ -247,6 +374,12 @@ public class ChatActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);//Khai báo một LinearLayoutManager để thiết lập layout cho RecyclerView
         layoutManager.setStackFromEnd(true);//Thứ tự load ra danh sách tin nhắn đi từ dưới lên
         recyclerViewMessageChat.setLayoutManager(layoutManager);//Gắn layout manager cho recyclerViewMessageChat
+        linear_rec_sound = findViewById(R.id.linear_rec_sound);
+        round_button = findViewById(R.id.round_button);
+        btn_hold_to_rec_sound = findViewById(R.id.btn_hold_to_rec_sound);
+        txt_instruction_rec = findViewById(R.id.txt_instruction_rec);
+        btn_cancel_rec = findViewById(R.id.btn_cancel_rec);
+        btn_hand_rec = findViewById(R.id.btn_hand_rec);
     }
 
     //Xử lý sự kiện khi bấm nút Send
@@ -261,8 +394,8 @@ public class ChatActivity extends AppCompatActivity {
             chatRef.set(chat);//set dữ liệu của chat cho document
             LoadMessage();//gọi hàm load tin nhắn
         }
-        UUID uuid =  UUID.randomUUID();//Tạo 1 uuid ngẫu nhiên,dùng uuid vì id này đảm bảo không trùng lập
-        if(layoutImgSendMessage.getVisibility()==View.VISIBLE){//upload ảnh
+        UUID uuid = UUID.randomUUID();//Tạo 1 uuid ngẫu nhiên,dùng uuid vì id này đảm bảo không trùng lập
+        if (layoutImgSendMessage.getVisibility() == View.VISIBLE) {//upload ảnh
             FirebaseStorage storage = FirebaseStorage.getInstance();//Khai báo storage liên kết tới Storage trên Firebase
             StorageReference storageRef = storage.getReference().child("IMAGES");//Khai báo StorageReference chỉ đến nhánh IMAGES
             StorageReference filePath = storageRef.child(uuid.toString());// Khai báo 1 đường đẫn trên StorageReference
@@ -270,7 +403,7 @@ public class ChatActivity extends AppCompatActivity {
             uploadTask.continueWithTask(new Continuation() {//Theo dõi tiến trình upload file
                 @Override
                 public Object then(@NonNull Task task) throws Exception {
-                    if(!task.isSuccessful()){//Nếu upload lỗi
+                    if (!task.isSuccessful()) {//Nếu upload lỗi
                         throw task.getException();
                     }
                     return filePath.getDownloadUrl();//Trả về đường dẫn của file sau khi upload thành công
@@ -278,10 +411,10 @@ public class ChatActivity extends AppCompatActivity {
             }).addOnCompleteListener(new OnCompleteListener() {//Xử lý sau khi upload xong
                 @Override
                 public void onComplete(@NonNull Task task) {
-                    if(task.isSuccessful()){
-                        String path =  task.getResult().toString();//Lấy đường dẫn tới file vừa upload xong
+                    if (task.isSuccessful()) {
+                        String path = task.getResult().toString();//Lấy đường dẫn tới file vừa upload xong
                         Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), path,
-                                new Date().getTime(),-1,Constants.IMAGE);//Tạo 1 object Message chứa nội dung tin nhắn
+                                new Date().getTime(), -1, Constants.IMAGE);//Tạo 1 object Message chứa nội dung tin nhắn
                         db.collection(Constants.MESSAGE_COLLECTION)//Lấy collection MESSAGES trong database
                                 .document(chatId)//Lấy đến document có id là chatId
                                 .collection(Constants.SUBMESSAGE_COLLECTION)//Lấy một sub collection SUBMESSAGE chứa danh sách tin nhắn
@@ -289,7 +422,7 @@ public class ChatActivity extends AppCompatActivity {
 
                         db.collection(Constants.CHAT_COLLECTION)
                                 .document(chatId)
-                                .update("lastmessage","[Hình ảnh]");//Cập nhật lại thông tin của document Chat trên database
+                                .update("lastmessage", "[Hình ảnh]");//Cập nhật lại thông tin của document Chat trên database
                     }
                 }
             });
@@ -297,11 +430,34 @@ public class ChatActivity extends AppCompatActivity {
             imgSendMessage = null;//Gắn lại giá trị null cho hình ảnh sau khi gửi đi
             fileImageSend = null;//Gắn lại giá trị null cho file ảnh được chọn sau khi gửi đi
             layoutImgSendMessage.setVisibility(GONE);//ẩn đi layout chứa ảnh được chọn
-        }
-        else {
+        } else if (fileAudioPath != null) {
+            FirebaseStorage storage = FirebaseStorage.getInstance();//Khai báo storage liên kết tới Storage trên Firebase
+            StorageReference storageRef = storage.getReference().child("audios");//Khai báo StorageReference chỉ đến nhánh IMAGES
+            StorageReference filePath = storageRef.child(uuid.toString());// Khai báo 1 đường đẫn trên StorageReference
+            fileAudioSend=Uri.fromFile(new File(fileAudioPath));
+            uploadTask = filePath.putFile(fileAudioSend);//Đẩy file lên database
+            uploadTask.continueWithTask(new Continuation() {
+                @Override
+                public Object then(@NonNull Task task) throws Exception {
+                    if (!task.isSuccessful()) {//Nếu upload lỗi
+                        throw task.getException();
+                    }
+                    return filePath.getDownloadUrl();//Trả về đường dẫn của file sau khi upload thành công
+                }
+            }).addOnCompleteListener(new OnCompleteListener() {
+                @Override
+                public void onComplete(@NonNull Task task) {
+                    if (task.isSuccessful()) {
+                        System.out.println("Finished");
+                    }
+                }
+            });
+            fileAudioPath = null;//xóa path
+            fileAudioSend = null;
+        } else {
             //Khởi tạo một message chứa nội dung tin nhắn
             Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), txtBodyMessage.getText().toString(),
-                    new Date().getTime(),-1,Constants.TEXT);
+                    new Date().getTime(), -1, Constants.TEXT);
             //truy cập đến Collection MESSAGES, document chatId, subcollection SUBMESSAGE
             db.collection(Constants.MESSAGE_COLLECTION)
                     .document(chatId)
@@ -309,7 +465,7 @@ public class ChatActivity extends AppCompatActivity {
                     .document(message.getId()).set(message);//Đưa thông tin của message thành 1 document trên Database
             db.collection(Constants.CHAT_COLLECTION)
                     .document(chatId)
-                    .update("lastmessage",message.getContent());//Cập nhập lại field lassmessage của Chat
+                    .update("lastmessage", message.getContent());//Cập nhập lại field lassmessage của Chat
             txtBodyMessage.setText("");//Gắn lại chuỗi rỗng cho khung nhập tin nhắn sau khi gửi đi
         }
 
@@ -317,10 +473,10 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     //Hàm xử lý load tin nhắn
-    private void LoadMessage(){
-        if(chatId==null || chatId.equals(""))//Nếu chatId null hoặc là chuỗi rỗng thì dừng xử lý
+    private void LoadMessage() {
+        if (chatId == null || chatId.equals(""))//Nếu chatId null hoặc là chuỗi rỗng thì dừng xử lý
             return;
-        messageAdapter = new MessageAdapter(messageList,ChatActivity.this,chatId);//Khởi tạo 1 Message Adapter đảm nhiệm hiển thị danh sách tin nhắn
+        messageAdapter = new MessageAdapter(messageList, ChatActivity.this, chatId);//Khởi tạo 1 Message Adapter đảm nhiệm hiển thị danh sách tin nhắn
         //Thực hiện truy vấn đến collection MESSAGES
         db.collection(Constants.MESSAGE_COLLECTION)
                 .document(chatId)
@@ -330,17 +486,16 @@ public class ChatActivity extends AppCompatActivity {
                     @Override//Xử lý khi truy vấn xong
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                         messageList.clear();//Dọn sạch danh sách tin nhắn cũ
-                        for (QueryDocumentSnapshot doc:value){//Duyệt qua từng tin nhắn
+                        for (QueryDocumentSnapshot doc : value) {//Duyệt qua từng tin nhắn
                             Message message = doc.toObject(Message.class);//Mapping từ document sang object Message
                             MessageChat messageChat;//Khai báo 1 object MessageChat, có tác dụng chứa thông tin để hiển thị lên cho người dùng
-                            if(message.getSender().equals(userOwn.getUserId()))//nếu là người gửi là mình
+                            if (message.getSender().equals(userOwn.getUserId()))//nếu là người gửi là mình
                             {
                                 //Gắn Avatar là của mình
-                                messageChat= MessageMapping.EntityToMessageChat(message,myAvatar);
-                            }
-                            else {
+                                messageChat = MessageMapping.EntityToMessageChat(message, myAvatar);
+                            } else {
                                 //Gắn Avatar là của người nhận
-                                messageChat = MessageMapping.EntityToMessageChat(message,friendAvatar);
+                                messageChat = MessageMapping.EntityToMessageChat(message, friendAvatar);
                             }
                             messageList.add(messageChat);//Thêm tin nhắn vào danh sách tin nhắn
                         }
@@ -371,24 +526,24 @@ public class ChatActivity extends AppCompatActivity {
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent intent = result.getData();//Lấy dữ liệu được trả về từ intent sau khi chọn file xong
-                            fileImageSend = intent.getData();//Lấy Uri của ảnh
-                            if (null != fileImageSend) {//kiểm tra nếu khác null
-                                InputStream imageStream = null;//Khai báo imageStream để chứa dữ liệu ảnh
-                                try {
-                                    imageStream = getContentResolver().openInputStream(fileImageSend);//load ảnh từ uri
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                }
-                                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);//Decode từ stream sang dữ liệu ảnh dạng bitmap
-                                imgSendMessage.setImageBitmap(selectedImage);//set dữ liệu ảnh cho imgSendMessage
-                                layoutImgSendMessage.setVisibility(View.VISIBLE);//Hiện lên layout chứa ảnh được chọn
-
-                                btnSend.getLayoutParams().width = 60;//Điều chỉnh kích thước nút gửi
-                                btnMoreHoz.setVisibility(GONE);//Ẩn btn MoreHoz
-                                btnRecSound.setVisibility(GONE);//Ẩn btn RecSound
-                                btnGetImage.setVisibility(GONE);//Ẩn btn GetImage
-                                btnSend.setVisibility(View.VISIBLE);//Ẩn btn Send
+                        fileImageSend = intent.getData();//Lấy Uri của ảnh
+                        if (null != fileImageSend) {//kiểm tra nếu khác null
+                            InputStream imageStream = null;//Khai báo imageStream để chứa dữ liệu ảnh
+                            try {
+                                imageStream = getContentResolver().openInputStream(fileImageSend);//load ảnh từ uri
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
                             }
+                            Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);//Decode từ stream sang dữ liệu ảnh dạng bitmap
+                            imgSendMessage.setImageBitmap(selectedImage);//set dữ liệu ảnh cho imgSendMessage
+                            layoutImgSendMessage.setVisibility(View.VISIBLE);//Hiện lên layout chứa ảnh được chọn
+
+                            btnSend.getLayoutParams().width = 60;//Điều chỉnh kích thước nút gửi
+                            btnMoreHoz.setVisibility(GONE);//Ẩn btn MoreHoz
+                            btnRecSound.setVisibility(GONE);//Ẩn btn RecSound
+                            btnGetImage.setVisibility(GONE);//Ẩn btn GetImage
+                            btnSend.setVisibility(View.VISIBLE);//Ẩn btn Send
+                        }
 
                     }
                 }
@@ -400,4 +555,16 @@ public class ChatActivity extends AppCompatActivity {
         layoutImgSendMessage.setVisibility(GONE);//Ẩn layout chọn ảnh
     }
 
+    public boolean checkPermissions() {
+        // this method is used to check permission
+        int result = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
+        int result1 = ContextCompat.checkSelfPermission(getApplicationContext(), RECORD_AUDIO);
+        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermissions() {
+        // this method is used to request the
+        // permission for audio recording and storage.
+        ActivityCompat.requestPermissions(ChatActivity.this, new String[]{RECORD_AUDIO, WRITE_EXTERNAL_STORAGE}, REQUEST_AUDIO_PERMISSION_CODE);
+    }
 }
