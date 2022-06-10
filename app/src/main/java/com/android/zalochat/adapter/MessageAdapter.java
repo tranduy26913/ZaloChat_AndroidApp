@@ -129,12 +129,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
 
         if (messageChat.getMessage().getType().equals(Constants.IMAGE)) {//Trường hợp tin nhắn là hình ảnh
             holder.tvMessageContent.setVisibility(View.GONE);//ẩn đi tin nhắn văn bản
+            holder.iconPlaySound.setVisibility(View.GONE);
             holder.imgMessage.setVisibility(View.VISIBLE);//Hiển thị phần tử Image View để chứa hình ảnh
             holder.layoutMessageChatContent.setVisibility(View.GONE);//ẩn layout chứa tin nhắn văn bản
             Picasso.get().load(messageChat.getMessage().getContent()).into(holder.imgMessage);//Load hình ảnh từ  url rồi truyền vào cho imgMessage
 
+        } else if (messageChat.getMessage().getType().equals(Constants.SOUND)) {
+            holder.imgMessage.setVisibility(View.GONE);// Ẩn đi phần tử Image View
+            holder.iconPlaySound.setVisibility(View.VISIBLE);
+            holder.tvMessageContent.setText("Âm thanh");//Gắn nội dung tin nhắn vào cho TextView Message content
         } else {//Trường hợp tin nhắn là văn bản
             holder.imgMessage.setVisibility(View.GONE);// Ẩn đi phần tử Image View
+            holder.iconPlaySound.setVisibility(View.GONE);
             holder.tvMessageContent.setText(messageChat.getMessage().getContent());//Gắn nội dung tin nhắn vào cho TextView Message content
         }
         if (messageChat.getMessage().getReaction() != -1)//Nếu reaction = -1 thì hiển thị hình ảnh không có reaction là like_border

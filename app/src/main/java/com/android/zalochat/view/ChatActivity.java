@@ -448,7 +448,16 @@ public class ChatActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task task) {
                     if (task.isSuccessful()) {
-                        System.out.println("Finished");
+                        String path = task.getResult().toString();//Lấy đường dẫn tới file vừa upload xong
+                        Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), path,
+                                new Date().getTime(), -1, Constants.SOUND);//Tạo 1 object Message chứa nội dung tin nhắn
+                        db.collection(Constants.MESSAGE_COLLECTION)//Lấy collection MESSAGES trong database
+                                .document(chatId)//Lấy đến document có id là chatId
+                                .collection(Constants.SUBMESSAGE_COLLECTION)//Lấy một sub collection SUBMESSAGE chứa danh sách tin nhắn
+                                .document(message.getId()).set(message);//Gắn thông tin của object message vào Database
+                        db.collection(Constants.CHAT_COLLECTION)
+                                .document(chatId)
+                                .update("lastmessage", "[Âm thanh]");//Cập nhật lại thông tin của document Chat trên database
                     }
                 }
             });
