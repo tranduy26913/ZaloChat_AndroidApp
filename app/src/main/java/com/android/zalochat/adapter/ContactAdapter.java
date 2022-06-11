@@ -44,7 +44,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactHolder> {
             Picasso.get().load(contact.getAvatar()).into(holder.imgAvatarUserChatPhoneBook);
         }
         holder.tvDisplayNameUserChatPhoneBook.setText(contact.getFullname());
-        Log.e("SIZE", "IS USER "+contact.isUser(),null);
         if(contact.isUser()){
             holder.btnStartChatPhoneBook.setVisibility(View.VISIBLE);
             holder.btnStartChatPhoneBook.setOnClickListener(new View.OnClickListener() {

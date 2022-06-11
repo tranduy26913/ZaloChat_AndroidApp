@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.zalochat.ForgotPasswordActivity;
 import com.android.zalochat.MainActivity;
 import com.android.zalochat.R;
 import com.android.zalochat.model.User;
@@ -123,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onTextViewForgotPassword(View view) {
         //Chuyển từ login activity sang Register activity
-        Intent intent = new Intent(this, RegisterActivity.class);
+        Intent intent = new Intent(this, ForgotPasswordActivity.class);
         intent.putExtra("phonenumber", txtPhoneLogin.getText().toString());//truyền số điện thoại sang Verify phone activity
         startActivity(intent);
     }
