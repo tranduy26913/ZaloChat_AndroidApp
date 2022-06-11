@@ -4,20 +4,6 @@ import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.view.View.GONE;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -33,43 +19,43 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.JsonWriter;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.zalochat.R;
 import com.android.zalochat.adapter.MessageAdapter;
 import com.android.zalochat.mapping.MessageMapping;
 import com.android.zalochat.model.Chat;
 import com.android.zalochat.model.Message;
+import com.android.zalochat.model.Upload;
 import com.android.zalochat.model.User;
 import com.android.zalochat.model.payload.MessageChat;
 import com.android.zalochat.model.payload.UserChat;
 import com.android.zalochat.util.Constants;
-import com.android.zalochat.util.Util;
-import com.google.android.gms.common.util.JsonUtils;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -82,14 +68,10 @@ import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import org.json.JSONObject;
-import org.json.JSONStringer;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -423,6 +405,13 @@ public class ChatActivity extends AppCompatActivity {
                         db.collection(Constants.CHAT_COLLECTION)
                                 .document(chatId)
                                 .update("lastmessage", "[Hình ảnh]");//Cập nhật lại thông tin của document Chat trên database
+                        DocumentReference uploadRef = db.collection(Constants.UPLOAD_COLLECTION).document(userOwn.getUserId());//Tạo một DocumentReference liên kết tới database
+                        DocumentReference subuploadRef = uploadRef.collection(Constants.SUBUPLOAD_COLLECTION).document();//Tạo một DocumentReference liên kết tới database
+                        Upload newUpload = new Upload();
+                        newUpload.setUrl("IMAGES/"+uuid.toString());
+                        newUpload.setUserId(userOwn.getUserId());
+                        newUpload.setDate(new Date().getTime());
+                        subuploadRef.set(newUpload);
                     }
                 }
             });

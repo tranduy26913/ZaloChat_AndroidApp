@@ -2,6 +2,8 @@ package com.android.zalochat.adapter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,9 +18,9 @@ import com.android.zalochat.util.Constants;
 import com.github.pgreze.reactions.ReactionPopup;
 import com.github.pgreze.reactions.ReactionsConfig;
 import com.github.pgreze.reactions.ReactionsConfigBuilder;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -132,8 +134,26 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
             holder.iconPlaySound.setVisibility(View.GONE);
             holder.imgMessage.setVisibility(View.VISIBLE);//Hiển thị phần tử Image View để chứa hình ảnh
             holder.layoutMessageChatContent.setVisibility(View.GONE);//ẩn layout chứa tin nhắn văn bản
-            Picasso.get().load(messageChat.getMessage().getContent()).into(holder.imgMessage);//Load hình ảnh từ  url rồi truyền vào cho imgMessage
+            //Picasso.get().load(messageChat.getMessage().getContent()).into(holder.imgMessage);//Load hình ảnh từ  url rồi truyền vào cho imgMessage
+            Picasso.get().load(messageChat.getMessage().getContent()).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    holder.imgMessage.setImageBitmap(bitmap);
+                }
 
+                @Override
+                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                    holder.imgMessage.setVisibility(View.GONE);
+                    holder.layoutMessageChatContent.setVisibility(View.VISIBLE);
+                    holder.tvMessageContent.setVisibility(View.VISIBLE);
+                    holder.tvMessageContent.setText("Hình ảnh đã xoá do quá hạn");
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            });
         } else if (messageChat.getMessage().getType().equals(Constants.SOUND)) {
             holder.imgMessage.setVisibility(View.GONE);// Ẩn đi phần tử Image View
             holder.iconPlaySound.setVisibility(View.VISIBLE);
