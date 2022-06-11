@@ -40,6 +40,7 @@ public class EnterCodeOtpActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;//Liên kết tới Firebase authentication
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

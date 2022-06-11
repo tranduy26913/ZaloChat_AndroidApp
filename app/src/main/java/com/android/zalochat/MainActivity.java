@@ -91,11 +91,12 @@ public class MainActivity extends AppCompatActivity {
         try {
             Gson gson  = new Gson();//Gson thực hiện các xử lý liên quan đến json
             userOwn = gson.fromJson(jsonUser,User.class);//CHuyển từ json sang object User
+            CheckImage();
         }catch (Exception ex) {
             //GotoLogin();
         }
 
-        CheckImage();
+
     }
 
     private void CheckLogin() {
