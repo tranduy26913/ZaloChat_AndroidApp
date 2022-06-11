@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +24,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -157,6 +167,47 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
         } else if (messageChat.getMessage().getType().equals(Constants.SOUND)) {
             holder.imgMessage.setVisibility(View.GONE);// Ẩn đi phần tử Image View
             holder.iconPlaySound.setVisibility(View.VISIBLE);
+            holder.layoutMessageChatContent.setOnClickListener(v -> {
+                System.out.println("Âm thanh");
+                URL url = null;
+                try {
+                    url = new URL(messageChat.getMessage().getContent());
+                    System.out.println(messageChat.getMessage().getContent());
+//                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+//                    urlConnection.setRequestMethod("GET");
+//                    urlConnection.setDoOutput(true);
+//                    urlConnection.connect();
+//                    File sdcard = Environment.getExternalStorageDirectory();
+//                    File file = new File(sdcard, "");
+//                    FileOutputStream fileOutput = new FileOutputStream(file);
+//                    InputStream inputStream = urlConnection.getInputStream();
+//
+//                    byte[] buffer = new byte[1024];
+//                    int bufferLength = 0;
+//
+//                    while ( (bufferLength = inputStream.read(buffer)) > 0 ) {
+//                        fileOutput.write(buffer, 0, bufferLength);
+//                    }
+//                    fileOutput.close();
+                    MediaPlayer mPlayer= new MediaPlayer();
+                    mPlayer.setDataSource(String.valueOf(url));
+                    // below method will prepare our media player
+                    mPlayer.prepare();
+                    if(holder.tvMessageContent.getText()=="........."){
+                        mPlayer.stop();
+                        holder.tvMessageContent.setText("Âm thanh");
+                    }
+                    else {
+                        // below method will start our media player.
+                        mPlayer.start();
+                        holder.tvMessageContent.setText(".........");
+                    }
+                } catch (MalformedURLException | ProtocolException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
             holder.tvMessageContent.setText("Âm thanh");//Gắn nội dung tin nhắn vào cho TextView Message content
         } else {//Trường hợp tin nhắn là văn bản
             holder.imgMessage.setVisibility(View.GONE);// Ẩn đi phần tử Image View
