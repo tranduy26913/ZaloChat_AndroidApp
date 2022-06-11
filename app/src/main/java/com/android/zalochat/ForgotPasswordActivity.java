@@ -63,14 +63,14 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     private void getDataFromIntent() {//Lấy dữ liệu từ Intent
         //Lấy dữ liệu phonenumber từ intent
-        String phonenumber = getIntent().getStringExtra("phonenumber");
+        phonenumber = getIntent().getStringExtra("phonenumber");
         txtPhone.setText(phonenumber);
     }
 
 
     public void onClickSendCode(View view) {//Xử lý sự kiện khi bấm nút gửi mã otp
         //Lấy số điện thoại và mã vùng
-        String phonenumber = ccp.getDefaultCountryCodeWithPlus()+txtPhone.getText().toString().trim();
+        phonenumber = ccp.getDefaultCountryCodeWithPlus()+txtPhone.getText().toString().trim();
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             //khi verify thành công
             @Override
