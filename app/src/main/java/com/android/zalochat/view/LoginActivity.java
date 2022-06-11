@@ -120,4 +120,11 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
     }
+
+    public void onTextViewForgotPassword(View view) {
+        //Chuyển từ login activity sang Register activity
+        Intent intent = new Intent(this, RegisterActivity.class);
+        intent.putExtra("phonenumber", txtPhoneLogin.getText().toString());//truyền số điện thoại sang Verify phone activity
+        startActivity(intent);
+    }
 }
