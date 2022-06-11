@@ -147,10 +147,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
             holder.iconPlaySound.setVisibility(View.GONE);
             holder.imgMessage.setVisibility(View.VISIBLE);//Hiển thị phần tử Image View để chứa hình ảnh
             holder.layoutMessageChatContent.setVisibility(View.GONE);//ẩn layout chứa tin nhắn văn bản
-            //Picasso.get().load(messageChat.getMessage().getContent()).into(holder.imgMessage);//Load hình ảnh từ  url rồi truyền vào cho imgMessage
+            Picasso.get().load(messageChat.getMessage().getContent()).into(holder.imgMessage);//Load hình ảnh từ  url rồi truyền vào cho imgMessage
             Picasso.get().load(messageChat.getMessage().getContent()).into(new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    holder.imgMessage.setVisibility(View.VISIBLE);
                     holder.imgMessage.setImageBitmap(bitmap);
                 }
 
