@@ -44,6 +44,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
     String pattern = "HH:mm";//Biến lưu pattern để hiển thị thời gian tin nhắn
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);//Khai báo Simple format để format thời gian
 
+    MediaPlayer mPlayer= null;
+    URL url = null;
+
     final int MSG_SENDER = 0, MSG_RECEIVER = 1;//2 biến đánh dấu người gửi và người nhận
 
     public MessageAdapter(List<MessageChat> messageList, Context context, String chatId) {
@@ -169,38 +172,22 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
             holder.iconPlaySound.setVisibility(View.VISIBLE);
             holder.layoutMessageChatContent.setOnClickListener(v -> {
                 System.out.println("Âm thanh");
-                URL url = null;
                 try {
-                    url = new URL(messageChat.getMessage().getContent());
-                    System.out.println(messageChat.getMessage().getContent());
-//                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-//                    urlConnection.setRequestMethod("GET");
-//                    urlConnection.setDoOutput(true);
-//                    urlConnection.connect();
-//                    File sdcard = Environment.getExternalStorageDirectory();
-//                    File file = new File(sdcard, "");
-//                    FileOutputStream fileOutput = new FileOutputStream(file);
-//                    InputStream inputStream = urlConnection.getInputStream();
-//
-//                    byte[] buffer = new byte[1024];
-//                    int bufferLength = 0;
-//
-//                    while ( (bufferLength = inputStream.read(buffer)) > 0 ) {
-//                        fileOutput.write(buffer, 0, bufferLength);
-//                    }
-//                    fileOutput.close();
-                    MediaPlayer mPlayer= new MediaPlayer();
-                    mPlayer.setDataSource(String.valueOf(url));
-                    // below method will prepare our media player
-                    mPlayer.prepare();
-                    if(holder.tvMessageContent.getText()=="........."){
+                    if(holder.tvMessageContent.getText()=="....Đang phát...."){
                         mPlayer.stop();
                         holder.tvMessageContent.setText("Âm thanh");
+                        url=null;
+                        mPlayer=null;
                     }
                     else {
+                        mPlayer=new MediaPlayer();
+                        url = new URL(messageChat.getMessage().getContent());
+                        mPlayer.setDataSource(String.valueOf(url));
+                        // below method will prepare our media player
+                        mPlayer.prepare();
                         // below method will start our media player.
                         mPlayer.start();
-                        holder.tvMessageContent.setText(".........");
+                        holder.tvMessageContent.setText("....Đang phát....");
                     }
                 } catch (MalformedURLException | ProtocolException e) {
                     e.printStackTrace();
