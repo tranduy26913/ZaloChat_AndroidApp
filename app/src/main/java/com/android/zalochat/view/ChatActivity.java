@@ -96,17 +96,14 @@ public class ChatActivity extends AppCompatActivity {
     MessageAdapter messageAdapter;//Adapter của Message, chịu trách nhiệm hiển thị danh sách tin nhắn
     private SharedPreferences pref;//Biến lưu SharedPreferences
     private Uri fileImageSend;//Biến lưu Uri của file ảnh trong máy khi chọn ảnh để gửi đi
-    private Uri fileAudioSend;
+    private Uri fileAudioSend;//Biến lưu Uri của file audio trong máy khi chọn ảnh để gửi đi
     private UploadTask uploadTask;//Biến lưu tác vụ Upload ảnh lên database Firebase
     final Gson gson = new Gson();//Khai báo một Gson chịu trách nhiệm xử lý liên quan đến dữ liệu json
     private FirebaseFirestore db = FirebaseFirestore.getInstance();//Lấy instance của Database Firestore
-    // creating a variable for medi recorder object class.
-    private MediaRecorder mRecorder;
-    // creating a variable for mediaplayer class
-    private MediaPlayer mPlayer;
-    // string variable is created for storing a file name
+    private MediaRecorder mRecorder;//đối tượng dùng để ghi âm
+    // Đường dẫn của file âm thanh đang có trong máy sau khi ghi âm
     private static String fileAudioPath = null;
-    // constant for storing audio permission
+    // hằng số lưu cấp quyền dùng âm thanh
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;
 
     @Override
@@ -239,30 +236,30 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 showRecordSoundWidget();
             }
-        });
-        btn_hold_to_rec_sound.setOnTouchListener(new View.OnTouchListener() {
+        });//nút để mở màn chức năng ghi âm trong đoạn chat
+        btn_hold_to_rec_sound.setOnTouchListener(new View.OnTouchListener() {//nút giữ để ghi âm
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                float tempX = event.getX();
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    startRecording();
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    pauseRecording();
-                    if (tempX <= -120) {
-                        //xóa ghi âm
+            public boolean onTouch(View v, MotionEvent event) {//sự kiện người dùng chạm vào màn hình
+                float tempX = event.getX();//lấy tọa độ x mà người dùng chạm vào màn hình.
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {//nếu người dùng đang chạm vào màn hình
+                    startRecording();//nếu người dùng giữ màn hình thì thu âm thanh
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {//nếu người dùng rời tay khỏi màn hình
+                    pauseRecording();//dừng ghi âm khi người dùng không còn nhấn giữ
+                    if (tempX <= -120) {//nếu nơi người dùng thả tay ra cách điểm chạm ban đầu là 120 về phía trái màn hình
+                        //xóa ghi âm không gửi đi
                         fileAudioPath = null;
-                        btn_cancel_rec.setVisibility(GONE);
-                        btn_hand_rec.setVisibility(GONE);
+                        btn_cancel_rec.setVisibility(GONE);//ẩn nút xóa
+                        btn_hand_rec.setVisibility(GONE);//ẩn nút ghi âm rãnh tay
                     } else {
-                        onClickSendMessage();
+                        onClickSendMessage();//nếu người dùng không thả vào vùng xóa thì file ghi âm sẽ được gửi đi
                     }
-                } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    if (tempX <= -120) {
-                        btn_cancel_rec.setVisibility(View.VISIBLE);
-                        btn_hand_rec.setVisibility(View.VISIBLE);
+                } else if (event.getAction() == MotionEvent.ACTION_MOVE) {//nếu người dùng đang chạm và di chuyển trong màn hình
+                    if (tempX <= -120) {//nếu người dùng giữ tay trên màn hình cách điểm chạm đầu tiên 120
+                        btn_cancel_rec.setVisibility(View.VISIBLE);//ko ẩn nút xóa âm thanh
+                        btn_hand_rec.setVisibility(View.VISIBLE);//không ẩn nút ghi âm rãnh tay
                     } else {
-                        btn_cancel_rec.setVisibility(GONE);
-                        btn_hand_rec.setVisibility(GONE);
+                        btn_cancel_rec.setVisibility(GONE);//nếu không nằm trong  vùng xóa ghi âm thì sẽ ẩn nút không cần thiết
+                        btn_hand_rec.setVisibility(GONE);//nếu không nằm trong  vùng xóa ghi âm thì sẽ ẩn nút không cần thiết
                     }
                 }
                 return true;
@@ -271,67 +268,51 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void pauseRecording() {
-        txt_instruction_rec.setText("Nhấn giữ để ghi âm");
-        // the audio recording.
-        mRecorder.stop();
-
-        // below method will release
-        // the media recorder class.
-        mRecorder.release();
-        mRecorder = null;
+        txt_instruction_rec.setText("Nhấn giữ để ghi âm");//hiển thị nút ghi âm báo là nhấn giữ nút thu để ghi âm
+        mRecorder.stop();//dừng ghi âm
+        mRecorder.release();//release âm thanh để xuất file
+        mRecorder = null;//gán rỗng mRecoder
     }
 
     private void startRecording() {
-        txt_instruction_rec.setText("Thả ra để gửi, di chuyển sang trái để xóa");
-        fileAudioPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        fileAudioPath += "/AudioRecording.3gp";
+        txt_instruction_rec.setText("Thả ra để gửi, di chuyển sang trái để xóa");//set Text thả ra gửi file âm thanh
+        fileAudioPath = Environment.getExternalStorageDirectory().getAbsolutePath();//lấy đường dẫn file âm thanh
+        fileAudioPath += "/AudioRecording.3gp";//file tên là AudioRecording với định dạng là 3gp
 
-        // below method is used to initialize
-        // the media recorder class
-        mRecorder = new MediaRecorder();
+        mRecorder = new MediaRecorder();//tạo mới biến mRecoder
 
-        // below method is used to set the audio
-        // source which we are using a mic.
-        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);//lấy nguồn thu âm từ mic
 
-        // below method is used to set
-        // the output format of the audio.
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);//chỉnh file audio định dạng là 3gp
 
-        // below method is used to set the
-        // audio encoder for our recorded audio.
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);//encode theo AMR_NB
 
-        // below method is used to set the
-        // output file location for our recorded audio
-        mRecorder.setOutputFile(fileAudioPath);
+        mRecorder.setOutputFile(fileAudioPath);//thiết lập đường dẫn file audio khi xuất ra
         try {
-            // below method will prepare
-            // our audio recorder class
-            mRecorder.prepare();
+            mRecorder.prepare();//chuẩn bị cho quy trình ghi âm
         } catch (IOException e) {
             Log.e("TAG", "prepare() failed");
         }
-        // start method will start
-        // the audio recording.
-        mRecorder.start();
+        mRecorder.start();//bắt đầu ghi âm
     }
 
     private void showRecordSoundWidget() {
-        if (checkPermissions()) {
-            if (linear_rec_sound.getVisibility() == View.VISIBLE) {
+        if (checkPermissions()) {//check có cấp quyền lưu trữ chưa
+            if (linear_rec_sound.getVisibility() == View.VISIBLE) {//nếu widget ghi âm đã hiển thị thì ẩn widget đó đi,
+                // giảm chiều dài bằng 0
                 linear_rec_sound.setVisibility(GONE);
                 linear_rec_sound.getLayoutParams().height = 0;
                 round_button.getLayoutParams().height = 0;
                 btn_hold_to_rec_sound.getLayoutParams().height = 0;
-            } else if (linear_rec_sound.getVisibility() == GONE) {
+            } else if (linear_rec_sound.getVisibility() == GONE) {//nếu widget ghi âm đã ẩn thì hiển thị widget đó đi,
+                // tăng chiều dài, cao vừa mức để nhìn thấy widget đó
                 linear_rec_sound.setVisibility(View.VISIBLE);
                 linear_rec_sound.getLayoutParams().height = 500;
                 round_button.getLayoutParams().height = 200;
                 btn_hold_to_rec_sound.getLayoutParams().height = 200;
             }
         } else {
-            requestPermissions();
+            requestPermissions();//yêu cầu cấp quyền nếu check quyền chưa được cấp
         }
 
     }
@@ -356,12 +337,12 @@ public class ChatActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);//Khai báo một LinearLayoutManager để thiết lập layout cho RecyclerView
         layoutManager.setStackFromEnd(true);//Thứ tự load ra danh sách tin nhắn đi từ dưới lên
         recyclerViewMessageChat.setLayoutManager(layoutManager);//Gắn layout manager cho recyclerViewMessageChat
-        linear_rec_sound = findViewById(R.id.linear_rec_sound);
-        round_button = findViewById(R.id.round_button);
-        btn_hold_to_rec_sound = findViewById(R.id.btn_hold_to_rec_sound);
-        txt_instruction_rec = findViewById(R.id.txt_instruction_rec);
-        btn_cancel_rec = findViewById(R.id.btn_cancel_rec);
-        btn_hand_rec = findViewById(R.id.btn_hand_rec);
+        linear_rec_sound = findViewById(R.id.linear_rec_sound);//gắn phần tử vùng chức năng ghi âm trong layout cho biến
+        round_button = findViewById(R.id.round_button);//gắn phần tử nút dạng hình tròn vào biến layout
+        btn_hold_to_rec_sound = findViewById(R.id.btn_hold_to_rec_sound);//gắn phần tử nút giữ ghi âm cho biến layout
+        txt_instruction_rec = findViewById(R.id.txt_instruction_rec);//gắn text view hướng dẫn cách ghi âm
+        btn_cancel_rec = findViewById(R.id.btn_cancel_rec);//gắn biến nút hủy bản ghi âm vào biến layout
+        btn_hand_rec = findViewById(R.id.btn_hand_rec);//gắn biến ghi âm rãnh tay vào biến layout
     }
 
     //Xử lý sự kiện khi bấm nút Send
@@ -419,11 +400,11 @@ public class ChatActivity extends AppCompatActivity {
             imgSendMessage = null;//Gắn lại giá trị null cho hình ảnh sau khi gửi đi
             fileImageSend = null;//Gắn lại giá trị null cho file ảnh được chọn sau khi gửi đi
             layoutImgSendMessage.setVisibility(GONE);//ẩn đi layout chứa ảnh được chọn
-        } else if (fileAudioPath != null) {
+        } else if (fileAudioPath != null) {//kiểm tra đường dẫn có trống không nếu ko trống thì đó là 1 tin nhắn âm thanh và sẽ được gửi đi ngay
             FirebaseStorage storage = FirebaseStorage.getInstance();//Khai báo storage liên kết tới Storage trên Firebase
             StorageReference storageRef = storage.getReference().child("audios");//Khai báo StorageReference chỉ đến nhánh IMAGES
             StorageReference filePath = storageRef.child(uuid.toString());// Khai báo 1 đường đẫn trên StorageReference
-            fileAudioSend=Uri.fromFile(new File(fileAudioPath));
+            fileAudioSend=Uri.fromFile(new File(fileAudioPath));//lấy uri từ file audio đã được lưu
             uploadTask = filePath.putFile(fileAudioSend);//Đẩy file lên database
             uploadTask.continueWithTask(new Continuation() {
                 @Override
@@ -439,7 +420,7 @@ public class ChatActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         String path = task.getResult().toString();//Lấy đường dẫn tới file vừa upload xong
                         Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), path,
-                                new Date().getTime(), -1, Constants.SOUND);//Tạo 1 object Message chứa nội dung tin nhắn
+                                new Date().getTime(), -1, Constants.SOUND);//Tạo 1 object Message chứa nội dung tin nhắn dạng âm thanh
                         db.collection(Constants.MESSAGE_COLLECTION)//Lấy collection MESSAGES trong database
                                 .document(chatId)//Lấy đến document có id là chatId
                                 .collection(Constants.SUBMESSAGE_COLLECTION)//Lấy một sub collection SUBMESSAGE chứa danh sách tin nhắn
@@ -451,7 +432,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
             fileAudioPath = null;//xóa path
-            fileAudioSend = null;
+            fileAudioSend = null;//xóa file âm thanh được lưu trong biến file audio sau khi được gửi
         } else {
             //Khởi tạo một message chứa nội dung tin nhắn
             Message message = new Message(uuid.toString(), userOwn.getUserId(), friendUser.getUserId(), txtBodyMessage.getText().toString(),
@@ -554,15 +535,14 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public boolean checkPermissions() {
-        // this method is used to check permission
+        //yêu cầu cấp 3 quyền lưu trữ bộ nhớ để lưu file âm thanh
         int result = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
         int result1 = ContextCompat.checkSelfPermission(getApplicationContext(), RECORD_AUDIO);
         return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestPermissions() {
-        // this method is used to request the
-        // permission for audio recording and storage.
+        //yêu cầu cấp quyền sẽ hiển thị cửa sổ hệ thống
         ActivityCompat.requestPermissions(ChatActivity.this, new String[]{RECORD_AUDIO, WRITE_EXTERNAL_STORAGE}, REQUEST_AUDIO_PERMISSION_CODE);
     }
 }

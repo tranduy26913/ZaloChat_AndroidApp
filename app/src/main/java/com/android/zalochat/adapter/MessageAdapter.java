@@ -44,8 +44,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
     String pattern = "HH:mm";//Biến lưu pattern để hiển thị thời gian tin nhắn
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);//Khai báo Simple format để format thời gian
 
-    MediaPlayer mPlayer= null;
-    URL url = null;
+    MediaPlayer mPlayer= null;//Biến lưu mPlayer dùng để gán vào file âm thanh lấy từ firebase để phát
+    URL url = null;//url của file âm thanh được lấy từ firebase
 
     final int MSG_SENDER = 0, MSG_RECEIVER = 1;//2 biến đánh dấu người gửi và người nhận
 
@@ -144,23 +144,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
 
         if (messageChat.getMessage().getType().equals(Constants.IMAGE)) {//Trường hợp tin nhắn là hình ảnh
             holder.tvMessageContent.setVisibility(View.GONE);//ẩn đi tin nhắn văn bản
-            holder.iconPlaySound.setVisibility(View.GONE);
+            holder.iconPlaySound.setVisibility(View.GONE);//ẩn đi icon phát âm thanh của tin nhắn
             holder.imgMessage.setVisibility(View.VISIBLE);//Hiển thị phần tử Image View để chứa hình ảnh
             holder.layoutMessageChatContent.setVisibility(View.GONE);//ẩn layout chứa tin nhắn văn bản
             Picasso.get().load(messageChat.getMessage().getContent()).into(holder.imgMessage);//Load hình ảnh từ  url rồi truyền vào cho imgMessage
-            Picasso.get().load(messageChat.getMessage().getContent()).into(new Target() {
+            Picasso.get().load(messageChat.getMessage().getContent()).into(new Target() {//load hình ảnh từ url rồi truyền vào imgMessage
+                //chia làm 3 trường hợp: đã load xong, load lỗi, chuẩn bị load
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    holder.imgMessage.setVisibility(View.VISIBLE);
-                    holder.imgMessage.setImageBitmap(bitmap);
+                    //ở trường hợp load thành công thì hiển thị hình ảnh
+                    holder.imgMessage.setVisibility(View.VISIBLE);//hiển thị layout imgMessage
+                    holder.imgMessage.setImageBitmap(bitmap);//gán hình ảnh vào imgMessage
                 }
 
                 @Override
                 public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                    holder.imgMessage.setVisibility(View.GONE);
-                    holder.layoutMessageChatContent.setVisibility(View.VISIBLE);
-                    holder.tvMessageContent.setVisibility(View.VISIBLE);
-                    holder.tvMessageContent.setText("Hình ảnh đã xoá do quá hạn");
+                    //trường hợp load thất bại do tuy có url nhưng ảnh không còn giá trị nên sẽ không hiển thị lên
+                    //trường hợp load thất bại thì chỉ hiển thị textView thông báo ảnh xóa do quá hạn
+                    holder.imgMessage.setVisibility(View.GONE);//ẩn đi widget hình ảnh trong tin nhắn
+                    holder.layoutMessageChatContent.setVisibility(View.VISIBLE);//hiển thị khung chat của tin nhắn
+                    holder.tvMessageContent.setVisibility(View.VISIBLE);//hiển thị nội dung văn bản của tin nhắn
+                    holder.tvMessageContent.setText("Hình ảnh đã xoá do quá hạn");//các trường hợp load thất bại sẽ thông báo là ảnh xóa do quá hạn
                 }
 
                 @Override
@@ -170,24 +174,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
             });
         } else if (messageChat.getMessage().getType().equals(Constants.SOUND)) {
             holder.imgMessage.setVisibility(View.GONE);// Ẩn đi phần tử Image View
-            holder.iconPlaySound.setVisibility(View.VISIBLE);
-            holder.layoutMessageChatContent.setOnClickListener(v -> {
-                System.out.println("Âm thanh");
+            holder.iconPlaySound.setVisibility(View.VISIBLE);// hiển thị biểu tượng phát âm thanh
+            holder.layoutMessageChatContent.setOnClickListener(v -> {//nếu tin nhắn là gửi âm thanh và ng dùng chọn thì sẽ chạy code dưới
                 try {
-                    if(holder.tvMessageContent.getText()=="....Đang phát...."){
-                        mPlayer.stop();
-                        holder.tvMessageContent.setText("Âm thanh");
-                        url=null;
-                        mPlayer=null;
+                    if(holder.tvMessageContent.getText()=="....Đang phát...."){//nếu âm thanh đang phát thì sẽ dừng
+                        mPlayer.stop();//dừng phát âm thanh
+                        holder.tvMessageContent.setText("Âm thanh");//hiển thị text "Âm thanh" cho tin nhắn gửi âm thanh khi chưa phát hoặc dừng phát
+                        url=null;//xóa hết giá trị url khi âm thanh dừng phát
+                        mPlayer=null;//xóa hết giá trị của mPlayer khi âm thanh dừng phát, mPlayer!=null khi người dùng chọn tin nhắn phát âm thanh
                     }
                     else {
+                        //gán giá trị mới để phát âm thanh của app
                         mPlayer=new MediaPlayer();
+                        //lấy url của file âm thanh từ nội dung tin nhắn được gừi từ firebase
                         url = new URL(messageChat.getMessage().getContent());
+                        //gán url vào mPlayer để có file âm thanh
                         mPlayer.setDataSource(String.valueOf(url));
-                        // below method will prepare our media player
+                        // chuẩn bị file âm thanh
                         mPlayer.prepare();
-                        // below method will start our media player.
+                        // bấm vào phát ra âm thanh mà người dùng nhận được.
                         mPlayer.start();
+                        //set Text thành trạng thái đang phát nhạc trên dt
                         holder.tvMessageContent.setText("....Đang phát....");
                     }
                 } catch (MalformedURLException | ProtocolException e) {
@@ -199,7 +206,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
             holder.tvMessageContent.setText("Âm thanh");//Gắn nội dung tin nhắn vào cho TextView Message content
         } else {//Trường hợp tin nhắn là văn bản
             holder.imgMessage.setVisibility(View.GONE);// Ẩn đi phần tử Image View
-            holder.iconPlaySound.setVisibility(View.GONE);
+            holder.iconPlaySound.setVisibility(View.GONE);// Ẩn đi biểu tượng phát âm thanh của tin nhắn
             holder.tvMessageContent.setText(messageChat.getMessage().getContent());//Gắn nội dung tin nhắn vào cho TextView Message content
         }
         if (messageChat.getMessage().getReaction() != -1)//Nếu reaction = -1 thì hiển thị hình ảnh không có reaction là like_border
