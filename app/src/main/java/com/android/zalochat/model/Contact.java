@@ -1,5 +1,7 @@
 package com.android.zalochat.model;
 
+import com.android.zalochat.model.payload.UserChat;
+
 import java.io.Serializable;
 
 public class Contact implements Serializable {
@@ -7,6 +9,7 @@ public class Contact implements Serializable {
     protected String phone;
     protected String fullname = "";
     protected String avatar = "";
+    protected boolean isUser = false;
     protected boolean active = false;
     protected boolean online = true;
 
@@ -51,5 +54,40 @@ public class Contact implements Serializable {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public boolean isUser() {
+        return isUser;
+    }
+
+    public void setUser(boolean user) {
+        isUser = user;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
+    public UserChat ContactToUserChat(){
+        UserChat user = new UserChat();
+        user.setFullname(this.getFullname());
+        user.setAvatar(this.getAvatar());
+        user.setUserId(this.getUserId());
+        user.setPhone(this.getPhone());
+        user.setChatId("");
+        user.setMessage("");
+        return user;
     }
 }

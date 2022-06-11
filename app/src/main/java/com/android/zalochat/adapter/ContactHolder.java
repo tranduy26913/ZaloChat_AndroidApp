@@ -1,6 +1,7 @@
 package com.android.zalochat.adapter;
 
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ public class ContactHolder extends RecyclerView.ViewHolder{
     public final TextView tvDisplayNameUserChatPhoneBook;
     public final TextView tvDescriptionMessagePhoneBook;
     public final ConstraintLayout layoutInfoUserChatPhoneBook;
+    public final Button btnStartChatPhoneBook;
 
     public ContactHolder(@NonNull View view) {
         super(view);
@@ -22,5 +24,6 @@ public class ContactHolder extends RecyclerView.ViewHolder{
         this.tvDescriptionMessagePhoneBook = view.findViewById(R.id.tvDescriptionMessagePhoneBook);
         this.tvDisplayNameUserChatPhoneBook = view.findViewById(R.id.tvDisplayNameUserChatPhoneBook);
         this.layoutInfoUserChatPhoneBook = view.findViewById(R.id.layoutInfoUserChatPhoneBook);
+        this.btnStartChatPhoneBook = view.findViewById(R.id.btnStartChatPhoneBook);
     }
 }
