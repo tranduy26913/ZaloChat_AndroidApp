@@ -4,9 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="10dp"
     android:layout_marginTop="2dp"
-    android:layout_marginEnd="120dp"
     android:layout_marginBottom="2dp"
     android:background="@drawable/flag_transparent"
     app:layout_constraintEnd_toEndOf="parent"
@@ -18,7 +16,7 @@
         android:id="@+id/imgAvatarMessage"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginStart="0dp"
+        android:layout_marginStart="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/circle"
@@ -27,29 +25,29 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutMessage"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="4dp"
-        app:layout_constraintStart_toEndOf="@id/imgAvatarMessage"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="120dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgReactionMessage"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="0dp"
-            android:layout_marginTop="-5dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginTop="-10dp"
+            android:layout_marginEnd="8dp"
             android:background="@color/white"
             android:src="@drawable/ic_like_border"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/layoutMessageChatContent"
             app:layout_constraintTop_toBottomOf="@id/layoutMessageChatContent"
             app:shapeAppearanceOverlay="@style/circle"
 
             />
-
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgBodyMessage"
@@ -89,11 +87,12 @@
                 android:id="@+id/tvMessageContent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Message contmmmmment"
+                android:text="Message contmmmsss sssssssssssssssssssssssssssssmment"
                 android:textColor="@color/txt_color"
                 android:textSize="18sp"
                 app:layout_constraintLeft_toRightOf="@+id/iconPlaySound"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
 
                 />
 
