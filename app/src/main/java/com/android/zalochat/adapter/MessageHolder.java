@@ -18,7 +18,7 @@ public class MessageHolder extends RecyclerView.ViewHolder {
     public final ImageView imgReaction;//Liên kết tới phần tử ImageView img Reaction trên layout
     public final TextView tvMessageTime;//Liên kết tới phần tử TextView tvMessageTime trên layout
     public final ConstraintLayout layoutMessageChatContent;//Liên kết tới phần tử ContraintLayout trên layout
-    public final ImageView iconPlaySound;
+    public final ImageView iconPlaySound;//Liên kết tới phần tử ImageView iconPlaySound trên layout
     public MessageHolder(@NonNull View view){
         super(view);
         this.tvMessageContent = view.findViewById(R.id.tvMessageContent);//Gắn TextView tvMessageContent cho biến
@@ -29,6 +29,6 @@ public class MessageHolder extends RecyclerView.ViewHolder {
         this.imgReaction = view.findViewById(R.id.imgReactionMessage);//Gắn ImageView imgReaction cho biến
         this.imgReaction.setZ(10);//Thiết lập Z-index cho imgReaction, để phần tử này nằm trên các phần tử khác
         this.imgAvatarMessage.setZ(10);//Thiết lập Z-index cho imgAvatarMessage, để phần tử này nằm trên các phần tử khác
-        this.iconPlaySound=view.findViewById(R.id.iconPlaySound);
+        this.iconPlaySound=view.findViewById(R.id.iconPlaySound);//Gắn ImageView iconPlaySound cho biến
     }
 }
