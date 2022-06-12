@@ -428,13 +428,13 @@ public class ChatActivity extends AppCompatActivity {
                         db.collection(Constants.CHAT_COLLECTION)
                                 .document(chatId)
                                 .update("lastmessage", "[Âm thanh]");//Cập nhật lại thông tin của document Chat trên database
-                        DocumentReference uploadRef = db.collection(Constants.UPLOAD_COLLECTION).document(userOwn.getUserId());//Tạo một DocumentReference liên kết tới database
-                        DocumentReference subuploadRef = uploadRef.collection(Constants.SUBUPLOAD_COLLECTION).document();//Tạo một DocumentReference liên kết tới database
-                        Upload newUpload = new Upload();
-                        newUpload.setUrl("audios/"+uuid.toString());
-                        newUpload.setUserId(userOwn.getUserId());
-                        newUpload.setDate(new Date().getTime());
-                        subuploadRef.set(newUpload);
+//                        DocumentReference uploadRef = db.collection(Constants.UPLOAD_COLLECTION).document(userOwn.getUserId());//Tạo một DocumentReference liên kết tới database
+//                        DocumentReference subuploadRef = uploadRef.collection(Constants.SUBUPLOAD_COLLECTION).document();//Tạo một DocumentReference liên kết tới database
+//                        Upload newUpload = new Upload();
+//                        newUpload.setUrl("audios/"+uuid.toString());
+//                        newUpload.setUserId(userOwn.getUserId());
+//                        newUpload.setDate(new Date().getTime());
+//                        subuploadRef.set(newUpload);
                     }
                 }
             });
