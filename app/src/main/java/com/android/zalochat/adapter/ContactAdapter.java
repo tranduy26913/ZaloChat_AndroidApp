@@ -42,6 +42,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactHolder> {
         holder.tvDescriptionMessagePhoneBook.setText("");
         if(!contact.getAvatar().equals("")){
             Picasso.get().load(contact.getAvatar()).into(holder.imgAvatarUserChatPhoneBook);
+        }else{
+            holder.imgAvatarUserChatPhoneBook.setImageResource(R.drawable.icon_user);
         }
         holder.tvDisplayNameUserChatPhoneBook.setText(contact.getFullname());
         Log.e("SIZE", "IS USER "+contact.isUser(),null);
