@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -173,37 +174,52 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
                 }
             });
         } else if (messageChat.getMessage().getType().equals(Constants.SOUND)) {
+            //lấy url của file âm thanh từ nội dung tin nhắn được gừi từ firebase
+            try{
+                url = new URL(messageChat.getMessage().getContent());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             holder.imgMessage.setVisibility(View.GONE);// Ẩn đi phần tử Image View
             holder.iconPlaySound.setVisibility(View.VISIBLE);// hiển thị biểu tượng phát âm thanh
-            holder.layoutMessageChatContent.setOnClickListener(v -> {//nếu tin nhắn là gửi âm thanh và ng dùng chọn thì sẽ chạy code dưới
-                try {
-                    if(holder.tvMessageContent.getText()=="....Đang phát...."){//nếu âm thanh đang phát thì sẽ dừng
-                        mPlayer.stop();//dừng phát âm thanh
-                        holder.tvMessageContent.setText("Âm thanh");//hiển thị text "Âm thanh" cho tin nhắn gửi âm thanh khi chưa phát hoặc dừng phát
-                        url=null;//xóa hết giá trị url khi âm thanh dừng phát
-                        mPlayer=null;//xóa hết giá trị của mPlayer khi âm thanh dừng phát, mPlayer!=null khi người dùng chọn tin nhắn phát âm thanh
-                    }
-                    else {
-                        //gán giá trị mới để phát âm thanh của app
-                        mPlayer=new MediaPlayer();
-                        //lấy url của file âm thanh từ nội dung tin nhắn được gừi từ firebase
-                        url = new URL(messageChat.getMessage().getContent());
-                        //gán url vào mPlayer để có file âm thanh
-                        mPlayer.setDataSource(String.valueOf(url));
-                        // chuẩn bị file âm thanh
-                        mPlayer.prepare();
-                        // bấm vào phát ra âm thanh mà người dùng nhận được.
-                        mPlayer.start();
-                        //set Text thành trạng thái đang phát nhạc trên dt
-                        holder.tvMessageContent.setText("....Đang phát....");
-                    }
-                } catch (MalformedURLException | ProtocolException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+            try {
+                if(!checkUrlNotExist(url)){
+                    holder.layoutMessageChatContent.setOnClickListener(v -> {//nếu tin nhắn là gửi âm thanh và ng dùng chọn thì sẽ chạy code dưới
+                        try {
+                            if(holder.tvMessageContent.getText()=="....Đang phát...."){//nếu âm thanh đang phát thì sẽ dừng
+                                mPlayer.stop();//dừng phát âm thanh
+                                holder.tvMessageContent.setText("Âm thanh");//hiển thị text "Âm thanh" cho tin nhắn gửi âm thanh khi chưa phát hoặc dừng phát
+                                url=null;//xóa hết giá trị url khi âm thanh dừng phát
+                                mPlayer=null;//xóa hết giá trị của mPlayer khi âm thanh dừng phát, mPlayer!=null khi người dùng chọn tin nhắn phát âm thanh
+                            }
+                            else {
+                                //gán giá trị mới để phát âm thanh của app
+                                mPlayer=new MediaPlayer();
+                                //gán url vào mPlayer để có file âm thanh
+                                url = new URL(messageChat.getMessage().getContent());
+                                mPlayer.setDataSource(String.valueOf(url));
+                                // chuẩn bị file âm thanh
+                                mPlayer.prepare();
+                                // bấm vào phát ra âm thanh mà người dùng nhận được.
+                                mPlayer.start();
+                                //set Text thành trạng thái đang phát nhạc trên dt
+                                holder.tvMessageContent.setText("....Đang phát....");
+                            }
+                        } catch (MalformedURLException | ProtocolException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    holder.tvMessageContent.setText("Âm thanh");//Gắn nội dung tin nhắn vào cho TextView Message content
                 }
-            });
-            holder.tvMessageContent.setText("Âm thanh");//Gắn nội dung tin nhắn vào cho TextView Message content
+                else {
+                    holder.tvMessageContent.setText("Âm thanh bị xóa");//Gắn nội dung tin nhắn vào cho TextView Message content
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {//Trường hợp tin nhắn là văn bản
             holder.imgMessage.setVisibility(View.GONE);// Ẩn đi phần tử Image View
             holder.iconPlaySound.setVisibility(View.GONE);// Ẩn đi biểu tượng phát âm thanh của tin nhắn
@@ -230,6 +246,34 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> {//adapt
         if (messageList.get(position).getMessage().getSender().equals(userId)) {
             return MSG_SENDER;
         } else return MSG_RECEIVER;
+    }
+
+    private boolean checkUrlNotExist(URL url) throws IOException {
+        final int[] statusCode = {200};
+        try{
+            final HttpURLConnection con = (HttpURLConnection) new URL(String.valueOf(url)).openConnection();
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try  {
+                        HttpURLConnection.setFollowRedirects(false);
+                        con.setRequestMethod("GET");
+                    } catch (Exception e) {
+                        Log.e("ERROR_HTTP",e.toString());
+                        e.printStackTrace();
+                    }
+                    try {
+                        statusCode[0] =con.getResponseCode();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+        }catch (Exception e){
+            Log.e("Error",e.toString());
+        }
+        return (statusCode[0] == HttpURLConnection.HTTP_NOT_FOUND);
     }
 }
 
