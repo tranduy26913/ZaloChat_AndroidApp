@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import com.android.zalochat.ForgotPasswordActivity;
+
 import com.android.zalochat.MainActivity;
 import com.android.zalochat.R;
 import com.android.zalochat.model.User;

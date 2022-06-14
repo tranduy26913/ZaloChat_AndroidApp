@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "37691525458-bkkcuupcbmuvv2u5s28nea18naicuiml.apps.googleusercontent.com",
+          "client_id": "37691525458-i49b154un2c1ces0q2046nmqsoa1k5ic.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.android.zalochat",
-            "certificate_hash": "3b8fb11078bb58e5a993703ec13dc7fdae615d72"
+            "certificate_hash": "ff86818a8959f05a2df67c70ee5b6ad7f1c76829"
           }
         },
         {

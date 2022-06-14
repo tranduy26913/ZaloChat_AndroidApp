@@ -16,6 +16,8 @@ import com.android.zalochat.util.Constants;
 import com.android.zalochat.util.UtilPassword;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.hbb20.CountryCodePicker;
 
@@ -39,15 +41,31 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {//Thiết lập sự kiện khi bấm Button Register
             @Override
             public void onClick(View view) {
+
                 //Lấy số điẹn thoại của người dùng nhập vào kèm theo mã vùng
                 String phone = ccp.getDefaultCountryCodeWithPlus()+  txtPhone.getText().toString().trim();
                 String password = txtPassword.getText().toString();//Lấy mật khẩu do ng dùng nhập
                 String fullname = txtName.getText().toString();//Lấy tên đầy đủ
                 User user = new User(phone,password,fullname);//Khởi tạo 1 object User
-                if(validate(user)){//Nếu user là hợp lệ
-                    user.setPassword(UtilPassword.HashPassword(password));//Hash mật khẩu và gắn lại mật khẩu đã mã hoá
-                    RegisterAccount(user);//Đăng ký tài khoản, lưu vào database
-                }
+                DocumentReference docRef = database.collection(Constants.USER_COLLECTION).document(phone);
+                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Toast.makeText(getApplicationContext(),"Số điện thoại đã tồn tại trên hệ thống. Vui lòng sử dụng số điện thoại khác",Toast.LENGTH_LONG).show();
+                            } else {
+                                if(validate(user)){//Nếu user là hợp lệ
+                                    user.setPassword(UtilPassword.HashPassword(password));//Hash mật khẩu và gắn lại mật khẩu đã mã hoá
+                                    RegisterAccount(user);//Đăng ký tài khoản, lưu vào database
+                                }
+                            }
+                        } else {
+                            Toast.makeText(getApplicationContext(),"Lỗi tạo tài khoản",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
             }
         });
     }
@@ -94,7 +112,13 @@ public class RegisterActivity extends AppCompatActivity {
         Pattern numphone = Pattern.compile("\\+\\d+$");//Pattern kiểm tra số điện thoại có đúng form không
 
         boolean rs = true;
-        if(user.getPhone().startsWith("+840")){//kiểm tra số 0 đầu tiên, vì dùng mã vùng nên ko có số 0
+
+        if(user.getFullname() == null || user.getFullname().length() == 0 || user.getFullname().length() > 50){
+            //Kiểm tra xem tên đầy đủ có hợp lệ không, phải nhỏ hơn 50 kí tự
+            Toast.makeText(this,"Tên không hợp lệ",Toast.LENGTH_SHORT).show();
+            rs = false;
+        }
+        else if(user.getPhone().startsWith("+840")){//kiểm tra số 0 đầu tiên, vì dùng mã vùng nên ko có số 0
             Toast.makeText(this,"Số điện thoại không được bắt đầu với 0",Toast.LENGTH_SHORT).show();
             rs = false;
         }
@@ -104,11 +128,6 @@ public class RegisterActivity extends AppCompatActivity {
         }
         else if(user.getPhone() == null ||user.getPhone().length() != 12){//kiểm tra độ dài số điện thoại
             Toast.makeText(this,"số điện thoại bao gồm 9 chữ số",Toast.LENGTH_SHORT).show();
-            rs = false;
-        }
-        else if(user.getFullname() == null || user.getFullname().length() == 0 || user.getFullname().length() > 50){
-            //Kiểm tra xem tên đầy đủ có hợp lệ không, phải nhỏ hơn 50 kí tự
-            Toast.makeText(this,"Tên không hợp lệ",Toast.LENGTH_SHORT).show();
             rs = false;
         }
         else if(user.getPassword() == null || user.getPassword().length() == 0|| user.getPassword().length() > 50){

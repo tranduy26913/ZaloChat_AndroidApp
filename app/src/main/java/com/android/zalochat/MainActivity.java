@@ -15,6 +15,7 @@ import com.android.zalochat.model.Upload;
 import com.android.zalochat.model.User;
 import com.android.zalochat.util.Constants;
 import com.android.zalochat.view.LoginActivity;
+import com.android.zalochat.view.SearchActivity;
 import com.android.zalochat.view.fragment.AccountFragment;
 import com.android.zalochat.view.fragment.MessageFragment;
 import com.android.zalochat.view.fragment.PhoneBookFragment;

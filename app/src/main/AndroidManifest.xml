@@ -14,10 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ZaloChat">
         <activity
-            android:name=".ForgotPasswordActivity"
+            android:name=".view.ForgotPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".SearchActivity"
+            android:name=".view.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".view.ChatActivity"

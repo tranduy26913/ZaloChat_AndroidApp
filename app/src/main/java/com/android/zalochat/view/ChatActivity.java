@@ -160,21 +160,27 @@ public class ChatActivity extends AppCompatActivity {
             chatId = "";//Gắn chuỗi rỗng để tránh lỗi null
             db.collection(Constants.CHAT_COLLECTION)//tìm kiếm trên Collection CHATS
                     //Tìm kiếm xem có tồn tại document Chat nào mà có danh sách users bao gồm id của userOwn (người gửi) và friendUser (người nhận)
-                    .whereArrayContains("users", Arrays.asList(userOwn.getUserId(), friendUser.getUserId()))
+                    .whereArrayContains("users", userOwn.getUserId())
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
                         public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                             Chat chat;
                             for (QueryDocumentSnapshot doc : value) {//Duyệt qua danh sách các document tìm được
                                 chat = doc.toObject(Chat.class);//Ép kiểu sang object Chat
-                                chatId = chat.getId();//Gắn giá trị cho chatId
+                                if(chat.getUsers().contains(friendUser.getUserId())){
+                                    chatId = chat.getId();//Gắn giá trị cho chatId
+                                    LoadMessage();//Load ra danh sách tin nhắn
+                                    break;
+                                }
+
                             }
                         }
                     });
-        } else//Trường hợp có chatId
+        } else {//Trường hợp có chatId
             chatId = friendUser.getChatId();
-        if (!chatId.equals(""))//Nếu chatId khác chuỗi rỗng
             LoadMessage();//Load ra danh sách tin nhắn
+        }
+
     }
 
 
