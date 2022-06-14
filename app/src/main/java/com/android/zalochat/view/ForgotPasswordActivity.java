@@ -1,4 +1,4 @@
-package com.android.zalochat;
+package com.android.zalochat.view;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,11 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.zalochat.R;
 import com.android.zalochat.util.Constants;
 import com.android.zalochat.util.UtilPassword;
-import com.android.zalochat.view.EnterCodeOtpActivity;
-import com.android.zalochat.view.LoginActivity;
-import com.android.zalochat.view.VerifyPhoneActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
@@ -76,7 +74,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             @Override
             public void onVerificationCompleted(PhoneAuthCredential credential) {
                 Log.d(TAG, "onVerificationCompleted:" + credential);
-                signInWithPhoneAuthCredential(credential);
+                //signInWithPhoneAuthCredential(credential);
             }
             //Verify thất bại
             @Override

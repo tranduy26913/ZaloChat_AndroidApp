@@ -1,4 +1,4 @@
-package com.android.zalochat;
+package com.android.zalochat.view;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.android.zalochat.R;
 import com.android.zalochat.adapter.SearchAdapter;
 import com.android.zalochat.adapter.UserChatAdapter;
 import com.android.zalochat.event.IClickItemUserChatListener;

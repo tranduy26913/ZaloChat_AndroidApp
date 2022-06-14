@@ -5,23 +5,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
 
 import com.android.zalochat.R;
-import com.android.zalochat.SearchActivity;
 import com.android.zalochat.model.User;
 import com.android.zalochat.util.Constants;
-import com.android.zalochat.view.fragment.AccountFragment;
-import com.android.zalochat.view.fragment.MessageFragment;
-import com.android.zalochat.view.fragment.PhoneBookFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
