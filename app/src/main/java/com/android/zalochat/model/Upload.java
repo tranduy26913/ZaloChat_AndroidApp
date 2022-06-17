@@ -2,10 +2,10 @@ package com.android.zalochat.model;
 
 import java.io.Serializable;
 
-public class Upload implements Serializable {
-    protected String url;
-    protected String userId;
-    protected Long date;
+public class Upload implements Serializable { // Đối tượng này dùng để lưu trữ các thông tin của hình ảnh, ghi âm khi được upload lên hệ thống
+    protected String url; // URL ở đây nghĩa là tên file theo quy tắc "thu-muc-luu-tru/ten-file"
+    protected String userId; // Id người up
+    protected Long date; // thời gian up
     public String getUrl() {
         return url;
     }

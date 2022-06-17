@@ -2,7 +2,8 @@ package com.android.zalochat.model.payload;
 
 import java.io.Serializable;
 
-public class UserChat implements Serializable {
+public class UserChat implements Serializable { // Đối tượng này được sử dụng trong trường hợp gọi chức năng chat, không muốn lộ quá nhiều thông tin lên hệ thống, đối tượng này
+    // sẽ không có trên database
     private String avatar;
     private String fullname;
     private String message;

@@ -3,9 +3,9 @@ package com.android.zalochat.model;
 import java.util.Date;
 import java.util.List;
 
-public class Chat {
-    protected String id;
-    protected List<String> users;
+public class Chat { // Đối tượng đại diện cho đoạn chat giữa 2 người
+    protected String id; // id của đoạn chat
+    protected List<String> users; // id của 2 người chat của đoạn chat
 
     public List<String> getUsers() {
         return users;
@@ -16,8 +16,8 @@ public class Chat {
     }
 
     //protected String receiver;
-    protected long lasttime;
-    protected String lastmessage;
+    protected long lasttime; // thời gian chat cuối cùng
+    protected String lastmessage; // đoạn chat cuối cùng
 
     public String getId() {
         return id;

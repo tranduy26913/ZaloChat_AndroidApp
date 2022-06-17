@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 
 import com.android.zalochat.model.Message;
 
-public class MessageChat {
+public class MessageChat { // Được sử dụng đứa chứa thông tin chat và avatar người gửi, không có trên database
     private Message message;
     private Bitmap avatar;
 

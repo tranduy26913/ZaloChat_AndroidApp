@@ -2,14 +2,14 @@ package com.android.zalochat.model;
 
 import java.util.Date;
 
-public class Message {
-    protected String id;
-    protected String sender;
-    protected String receiver;
-    protected String content;
-    protected long time;
-    protected int reaction;
-    protected String type;
+public class Message { // Đối tượng cho đoạn tin nhắn giữa 2 người
+    protected String id; // id của đoạn tin nhắn
+    protected String sender; // id của người gửi
+    protected String receiver; // id của người nhận
+    protected String content; // nội dung đoạn chat
+    protected long time; // thời gian gửi
+    protected int reaction; // thông số reaction
+    protected String type; // dạng tin nhắn ( HÌNH ẢNH, GHI ÂM, TEXT)
 
     public String getId() {
         return id;
@@ -79,8 +79,6 @@ public class Message {
         this.reaction = reaction;
         this.time = time;
         this.type = type;
-
-
     }
 
 }

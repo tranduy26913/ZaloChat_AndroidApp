@@ -4,7 +4,8 @@ import com.android.zalochat.model.payload.UserChat;
 
 import java.io.Serializable;
 
-public class Contact implements Serializable {
+public class Contact implements Serializable { // Đối tượng đại diện cho danh bạ của người dùng, không có trên database, đối tượng này sẽ tương tự với user nhưng sẽ không có một vài
+    // trường (field)
     protected String userId;
     protected String phone;
     protected String fullname = "";
@@ -80,7 +81,7 @@ public class Contact implements Serializable {
         this.online = online;
     }
 
-    public UserChat ContactToUserChat(){
+    public UserChat ContactToUserChat(){ // ép kiểu từ Contact sang UserChat để phục vụ cho chức năng nhắn tin
         UserChat user = new UserChat();
         user.setFullname(this.getFullname());
         user.setAvatar(this.getAvatar());
