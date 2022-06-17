@@ -1,8 +1,5 @@
 package com.android.zalochat.view;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,10 +8,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.zalochat.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -106,16 +105,16 @@ public class VerifyPhoneActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
+                            //Xác thực OTP thành công
                             Log.d(TAG, "signInWithCredential:success");
 
                             FirebaseUser user = task.getResult().getUser();
                             // Update UI
                         } else {
-                            // Sign in failed, display a message and update the UI
+                            // Xác thực OTP thất bại
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                // The verification code entered was invalid
+                                //
                             }
                         }
                     }
@@ -126,8 +125,8 @@ public class VerifyPhoneActivity extends AppCompatActivity {
     private void GoToEnterCodeOtp(String verificationId, String phonenumber) {
         Intent intent = new Intent(this, EnterCodeOtpActivity.class);
         //truyền verificationid và phonenumber và EnterCodeActivity
-        intent.putExtra("verificationId", verificationId);
-        intent.putExtra("phonenumber", phonenumber);
+        intent.putExtra("verificationId", verificationId);//truyền verificationId vào intent
+        intent.putExtra("phonenumber", phonenumber);//truyền số vào intent
         startActivity(intent);
     }
 }
